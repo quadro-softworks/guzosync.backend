@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2016", // Or newer like ES2020
+    "module": "CommonJS",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true, // Required for DI decorators
+    "emitDecoratorMetadata": true, // Required for DI decorators
+    "baseUrl": "./src", // Allows non-relative imports from src
+    "paths": {
+      "@core/*": ["core/*"],
+      "@modules/*": ["modules/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
