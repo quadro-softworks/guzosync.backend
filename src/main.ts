@@ -44,7 +44,7 @@ const initializeApp = async (): Promise<Express> => {
 
   const router = app.router;
 
-  app.use(`${apiBasePath}/users`, userRoutes(router));
+  app.use(`${apiBasePath}/accounts`, userRoutes(router));
 
   // --- Global Error Handler (Must be LAST middleware) ---
   app.use(globalErrorHandler);
