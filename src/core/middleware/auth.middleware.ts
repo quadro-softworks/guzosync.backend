@@ -7,6 +7,7 @@ import {
   IJwtServiceMeta,
 } from '@core/services/jwt.service';
 import { UnauthorizedError } from '@core/errors/unauthorized.error';
+import setCookieParser from 'set-cookie-parser'; // Import set-cookie-parser if needed
 
 // Extend Express Request type to include 'user' using module augmentation
 declare module 'express' {
@@ -22,6 +23,14 @@ export const requireAuth = (
 ) => {
   try {
     // 1. Get token from header
+
+    const parsedSetCookie = setCookieParser.parse(req.headers.cookie || '');
+
+    const access_token = parsedSetCookie.find((c) => c.name === 'access_token');
+    if (access_token?.value) {
+      req.headers.authorization = `Bearer ${access_token.value}`;
+    }
+
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       throw new UnauthorizedError('No authentication token provided.');
