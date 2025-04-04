@@ -1,5 +1,5 @@
-import mongoose, { Schema, Document } from "mongoose";
-import { User } from "@modules/userManagement/domain/models/user.model";
+import mongoose, { Schema, Document } from 'mongoose';
+import { User } from '@modules/userManagement/domain/models/user.model';
 
 export interface IUserDocument extends User, Document {
   id: string; // Ensure id is string after transformation
@@ -16,7 +16,15 @@ const UserSchema: Schema = new Schema(
     },
     password: { type: String, required: true, select: false }, // Crucial: Don't select password by default
     name: { type: String, required: false, trim: true },
-    roles: [{ type: String, default: ["user"] }], // Default role
+    roles: [{ type: String, default: ['user'] }], // Default role
+    passwordResetToken: {
+      type: String,
+      select: false, // Don't include by default in queries
+    },
+    passwordResetExpires: {
+      type: Date,
+      select: false, // Don't include by default
+    },
   },
   {
     timestamps: true,
@@ -40,4 +48,4 @@ const UserSchema: Schema = new Schema(
   },
 );
 
-export const UserModel = mongoose.model<IUserDocument>("User", UserSchema);
+export const UserModel = mongoose.model<IUserDocument>('User', UserSchema);
