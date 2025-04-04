@@ -79,12 +79,18 @@ export class NodemailerEmailService implements IEmailService {
 
   async sendPasswordResetEmail(to: string, token: string): Promise<void> {
     // Construct the reset URL (adjust path as needed for your client app)
-    const resetUrl = `<span class="math-inline">\{config\.clientUrl\}/reset\-password?token\=</span>{token}`; // Example client path
+    // const resetUrl = `<span class="math-inline">\{config\.clientUrl\}/reset\-password?token\=</span>{token}`; // Example client path
 
+    const resetUrl = config.clientUrl + '/reset-password?token=' + token;
     const subject = 'Password Reset Request';
     const text = `You requested a password reset. Please use the following link to reset your password: ${resetUrl}\n\nIf you did not request this, please ignore this email.\nThis link will expire in 10 minutes.`; // TODO: Make expiry dynamic if needed
     const html = `<p>You requested a password reset. Please click the link below to reset your password:</p>
-                    <p><a href="<span class="math-inline">\{resetUrl\}"\></span>{resetUrl}</a></p>
+                    <p>
+                      <a href="${resetUrl}" 
+                        style="display:inline-block; padding:12px 24px; background-color:#4f46e5; color:#ffffff; text-decoration:none; border-radius:6px; font-weight:bold; font-family:sans-serif;">
+                        Reset Password
+                      </a>
+                    </p>
                     <p>If you did not request this, please ignore this email.</p>
                     <p>This link will expire in 10 minutes.</p>`; // TODO: Make expiry dynamic
 
