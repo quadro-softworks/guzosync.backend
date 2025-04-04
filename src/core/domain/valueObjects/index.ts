@@ -1,0 +1,10 @@
+export type UserId = string;
+export type BusStopId = string;
+export type BusId = string;
+export type IncidentId = string;
+export type FeedbackId = string;
+export type RouteId = string;
+export type TripId = string;
+export type ScheduleId = string;
+export type NotificationId = string;
+export type AlertId = string;
