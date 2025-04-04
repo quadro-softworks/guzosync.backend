@@ -1,6 +1,6 @@
 // src/core/events/event-bus.ts
-import EventEmitter from "eventemitter3";
-import { injectable, singleton } from "tsyringe";
+import EventEmitter from 'eventemitter3';
+import { injectable, singleton } from 'tsyringe';
 
 export interface IEvent {
   type: string; // Unique event identifier (e.g., 'bus.created', 'location.updated')
@@ -11,10 +11,14 @@ export interface IEvent {
 export interface IEventBus {
   publish<T extends IEvent>(event: T): void;
   subscribe<T extends IEvent>(
-    eventType: T["type"],
+    eventType: T['type'],
     handler: (event: T) => void | Promise<void>,
   ): void;
 }
+
+export const IEventBusMeta = {
+  name: 'IEventBus',
+};
 
 @injectable()
 @singleton() // Ensure only one instance of EventBus exists
@@ -27,7 +31,7 @@ export class AppEventBus implements IEventBus {
   }
 
   subscribe<T extends IEvent>(
-    eventType: T["type"],
+    eventType: T['type'],
     handler: (event: T) => void | Promise<void>,
   ): void {
     console.log(`[EventBus] Subscribing to event: ${eventType}`);

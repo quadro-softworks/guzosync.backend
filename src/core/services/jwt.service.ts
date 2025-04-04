@@ -1,8 +1,8 @@
 // src/core/services/jwt.service.ts
-import jwt, { SignOptions } from "jsonwebtoken";
-import { injectable } from "tsyringe";
-import config from "@core/config";
-import ms, { StringValue } from "ms";
+import jwt, { SignOptions } from 'jsonwebtoken';
+import { injectable } from 'tsyringe';
+import config from '@core/config';
+import ms, { StringValue } from 'ms';
 
 export interface IJwtPayload {
   userId: string;
@@ -15,6 +15,10 @@ export interface IJwtService {
   sign(payload: IJwtPayload): string;
   verify(token: string): IJwtPayload | null;
 }
+
+export const IJwtServiceMeta = {
+  name: 'IJwtService',
+};
 
 @injectable()
 export class JwtService implements IJwtService {
@@ -35,7 +39,7 @@ export class JwtService implements IJwtService {
         `Invalid JWT duration string in config: '${this.expiresIn}'`,
       );
       // Choose how to handle: throw error, use a default, etc. Throwing is safer.
-      throw new Error("Invalid JWT expiration configuration.");
+      throw new Error('Invalid JWT expiration configuration.');
     }
     const options: SignOptions = {
       expiresIn: expiresInSeconds, // Convert string to milliseconds
@@ -51,7 +55,7 @@ export class JwtService implements IJwtService {
       const decoded = jwt.verify(token, this.secret) as IJwtPayload;
       return decoded;
     } catch (error) {
-      console.error("JWT verification failed:", error);
+      console.error('JWT verification failed:', error);
       return null; // Return null or throw a specific error
     }
   }

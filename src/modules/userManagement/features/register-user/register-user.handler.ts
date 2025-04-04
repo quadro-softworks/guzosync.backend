@@ -1,17 +1,17 @@
 // src/modules/user-management/features/register-user/register-user.handler.ts
-import { injectable, inject } from "tsyringe";
-import { UserModel } from "@modules/userManagement/infrastructure/mongodb/schemas/user.schema"; // Adjust the import path as necessary
-import { PublicUser } from "../../domain/models/user.model"; // Use PublicUser for return type
-import { RegisterUserCommand } from "./register-user.command";
-import { IHashingService } from "@core/services/hashing.service";
-import { BadRequestError } from "@core/errors/bad-request.error";
+import { injectable, inject } from 'tsyringe';
+import { UserModel } from '@modules/userManagement/infrastructure/mongodb/schemas/user.schema'; // Adjust the import path as necessary
+import { PublicUser } from '../../domain/models/user.model'; // Use PublicUser for return type
+import { RegisterUserCommand } from './register-user.command';
+import { IHashingService } from '@core/services/hashing.service';
+import { BadRequestError } from '@core/errors/bad-request.error';
 // Optional: Import event bus if publishing an event
 // import { IEventBus } from '@core/events/event-bus';
 
 @injectable()
 export class RegisterUserHandler {
   constructor(
-    @inject("IHashingService") private hashingService: IHashingService,
+    @inject('IHashingService') private hashingService: IHashingService,
     // Optional: @inject('IEventBus') private eventBus: IEventBus
   ) {}
 

@@ -1,7 +1,7 @@
 // src/core/middleware/validate-request.ts
-import { Request, Response, NextFunction } from "express";
-import { AnyZodObject, ZodError } from "zod";
-import { ValidationError } from "@core/errors/validation.error";
+import { Request, Response, NextFunction } from 'express';
+import { AnyZodObject, ZodError } from 'zod';
+import { ValidationError } from '@core/errors/validation.error';
 
 export const validateRequest =
   (schema: AnyZodObject) =>
@@ -19,7 +19,7 @@ export const validateRequest =
         next(new ValidationError(error.issues));
       } else {
         // Handle unexpected errors during validation
-        next(new Error("An unexpected error occurred during validation."));
+        next(new Error('An unexpected error occurred during validation.'));
       }
     }
   };

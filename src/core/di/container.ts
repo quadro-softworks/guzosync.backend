@@ -1,5 +1,5 @@
 // src/core/di/container.ts
-import { container } from "tsyringe";
+import { container } from 'tsyringe';
 
 // Export the container instance to be used throughout the application
 export const appContainer = container;
