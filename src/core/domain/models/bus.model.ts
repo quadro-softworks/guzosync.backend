@@ -16,3 +16,5 @@ export interface Bus {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export const DefaultBusCapacity = 120;
