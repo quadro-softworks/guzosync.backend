@@ -1,12 +1,19 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { User } from '@modules/userManagement/domain/models/user.model';
+import { User } from '@core/domain/models/user.model';
+import { Role } from '@core/domain/enums/role.enum';
 
-export interface IUserDocument extends User, Document {
-  id: string; // Ensure id is string after transformation
-}
+// export interface IUserDocument extends User, Document {
+//   id: string; // Ensure id is string after transformation
+// }
 
-const UserSchema: Schema = new Schema(
+const UserSchema = new Schema<User>(
   {
+    id: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      unique: true,
+      auto: true, // Auto-generate ObjectId if not provided
+    },
     email: {
       type: String,
       required: true,
@@ -15,8 +22,8 @@ const UserSchema: Schema = new Schema(
       trim: true,
     },
     password: { type: String, required: true, select: false }, // Crucial: Don't select password by default
-    name: { type: String, required: false, trim: true },
-    roles: [{ type: String, default: ['user'] }], // Default role
+    firstName: { type: String, required: false, trim: true },
+    lastName: { type: String, required: false, trim: true },
     passwordResetToken: {
       type: String,
       select: false, // Don't include by default in queries
@@ -48,4 +55,4 @@ const UserSchema: Schema = new Schema(
   },
 );
 
-export const UserModel = mongoose.model<IUserDocument>('User', UserSchema);
+export const UserModel = mongoose.model<User>('User', UserSchema);

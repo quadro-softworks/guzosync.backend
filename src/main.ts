@@ -5,25 +5,19 @@ import config from '@core/config';
 import { connectDB } from '@core/database/mongo';
 import { globalErrorHandler } from '@core/middleware/error-handler';
 import { appContainer } from '@core/di/container';
-import { AppEventBus, IEventBus, IEventBusMeta } from '@core/events/event-bus';
-import {
-  BcryptHashingService,
-  IHashingService,
-  IHashingServiceMeta,
-} from '@core/services/hashing.service';
-import {
-  IJwtService,
-  IJwtServiceMeta,
-  JwtService,
-} from '@core/services/jwt.service';
+import http from 'http';
 import { userRoutes } from '@modules/userManagement/user.routes';
 import registerServices from '@core/di/registerServices';
+import { busRoutes } from '@modules/busRouteManagement/bus.routes';
+import { routesRoutes } from '@modules/busRouteManagement/routes.routes';
+import { controlCenterRoutes } from '@modules/operationsControl/control-center.routes';
 
-const initializeApp = async (): Promise<Express> => {
-  // --- Core Registrations ---
-  // Register core singletons like EventBus in the DI container
-  // Use interface token for loose coupling
+type HttpServer = http.Server<
+  typeof http.IncomingMessage,
+  typeof http.ServerResponse
+>;
 
+const initializeApp = async (): Promise<[Express, HttpServer]> => {
   registerServices(appContainer);
 
   // --- Database Connection ---
@@ -31,39 +25,55 @@ const initializeApp = async (): Promise<Express> => {
 
   // --- Express App Setup ---
   const app: Express = express();
+  const httpServer = http.createServer(app); // Create HTTP server with Express app
+
+  registerMiddlewares(app);
+
+  registerRoutes(app);
+
+  // --- Global Error Handler (Must be LAST middleware) ---
+  app.use(globalErrorHandler);
+
+  return [app, httpServer];
+};
+
+const registerMiddlewares = (app: Express) => {
   app.use(express.json()); // Middleware to parse JSON bodies
   app.use(express.urlencoded({ extended: true })); // Middleware for URL-encoded bodies
+};
 
+const registerRoutes = (app: Express) => {
   // --- Health Check Endpoint ---
   app.get('/', (req: Request, res: Response) => {
     res.status(200).send('Bus Tracking API is running!');
   });
 
-  // --- Register Module Routers ---
-  const apiBasePath = config.api.basePath;
-
-  const router = app.router;
-
-  app.use(`${apiBasePath}/accounts`, userRoutes(router));
-
-  // --- Global Error Handler (Must be LAST middleware) ---
-  app.use(globalErrorHandler);
-
-  return app;
+  app.use(`${config.api.basePath}/accounts`, userRoutes(app.router));
+  app.use(`${config.api.basePath}/buses`, busRoutes(app.router));
+  app.use(`${config.api.basePath}/routes`, routesRoutes(app.router));
+  app.use(
+    `${config.api.basePath}/control-center`,
+    controlCenterRoutes(app.router),
+  );
 };
 
-// --- Start Server ---
-console.log('Initializing application...'); // Add this line
-initializeApp()
-  .then((app) => {
-    console.log('Application initialized successfully!'); // Add this line
-    const port = config.port;
-    app.listen(port, () => {
-      console.log(`Server running in ${config.nodeEnv} mode on port ${port}`);
-      console.log(`API base path: ${config.api.basePath}`);
+const startServer = () => {
+  // --- Start Server ---
+  console.log('Initializing application...'); // Add this line
+  initializeApp()
+    .then(([app, httpServer]) => {
+      console.log('Application initialized successfully!'); // Add this line
+      const port = config.port;
+      httpServer.listen(port, () => {
+        console.log(`Server running in ${config.nodeEnv} mode on port ${port}`);
+        console.log(`API base path: ${config.api.basePath}`);
+      });
+    })
+    .catch((error) => {
+      console.error('Failed to initialize application:', error);
+      process.exit(1);
     });
-  })
-  .catch((error) => {
-    console.error('Failed to initialize application:', error);
-    process.exit(1);
-  });
+};
+
+// --- Start the server ---
+startServer();
