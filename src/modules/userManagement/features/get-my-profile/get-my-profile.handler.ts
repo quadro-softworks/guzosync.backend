@@ -1,14 +1,14 @@
 import { injectable } from 'tsyringe';
 import { NotFoundError } from '@core/errors/not-found.error';
-import { PublicUser } from '@modules/userManagement/domain/models/user.model';
 import { UserModel } from '@modules/userManagement/infrastructure/mongodb/schemas/user.schema';
+import { ProfileResult } from '@core/domain/dtos/profile-result.dto';
 
 @injectable()
 export class GetMyProfileHandler {
   // No external dependencies needed here usually
   constructor() {}
 
-  async execute(userId: string): Promise<PublicUser> {
+  async execute(userId: string): Promise<ProfileResult> {
     const user = await UserModel.findById(userId); // findById automatically excludes fields with select:false
 
     if (!user) {
@@ -17,6 +17,6 @@ export class GetMyProfileHandler {
     }
 
     // Use schema's toJSON transformation to remove password etc.
-    return user.toJSON() as PublicUser;
+    return user.toJSON() as ProfileResult;
   }
 }
