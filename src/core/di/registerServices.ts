@@ -22,6 +22,14 @@ import { RequestPasswordResetController } from '@modules/userManagement/features
 import { LogoutUserController } from '@modules/userManagement/features/logout-user/logout-user.controller';
 import { GetMyProfileController } from '@modules/userManagement/features/get-my-profile/get-my-profile.controller';
 import { GetMyProfileHandler } from '@modules/userManagement/features/get-my-profile/get-my-profile.handler';
+import {
+  IETAServiceMeta,
+  SimpleETAService,
+} from '@modules/busRouteManagement/services/eta.service';
+import {
+  ITrackingServiceMeta,
+  TrackingService,
+} from '@modules/busRouteManagement/services/tracking.service';
 
 export default function registerServices(appContainer: DependencyContainer) {
   console.log('Registering dependencies...'); // Add log for debugging
@@ -41,6 +49,9 @@ export default function registerServices(appContainer: DependencyContainer) {
   );
 
   appContainer.register('LogoutUserController', LogoutUserController);
+
+  appContainer.registerSingleton(IETAServiceMeta.name, SimpleETAService);
+  appContainer.registerSingleton(ITrackingServiceMeta.name, TrackingService);
 
   appContainer.register(
     'RequestPasswordResetHandler',
