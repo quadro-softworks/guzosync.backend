@@ -1,10 +1,11 @@
 // src/modules/user-management/features/register-user/register-user.handler.ts
 import { injectable, inject } from 'tsyringe';
 import { UserModel } from '@modules/userManagement/infrastructure/mongodb/schemas/user.schema'; // Adjust the import path as necessary
-import { PublicUser } from '../../domain/models/user.model'; // Use PublicUser for return type
+
 import { RegisterUserCommand } from './register-user.command';
 import { IHashingService } from '@core/services/hashing.service';
 import { BadRequestError } from '@core/errors/bad-request.error';
+import { AuthResult } from '@core/domain/dtos/auth-result.dto';
 // Optional: Import event bus if publishing an event
 // import { IEventBus } from '@core/events/event-bus';
 
@@ -15,7 +16,7 @@ export class RegisterUserHandler {
     // Optional: @inject('IEventBus') private eventBus: IEventBus
   ) {}
 
-  async execute(command: RegisterUserCommand): Promise<PublicUser> {
+  async execute(command: RegisterUserCommand): Promise<AuthResult> {
     // 1. Check if user already exists
     const existingUser = await UserModel.findOne({ email: command.email });
     if (existingUser) {
@@ -43,6 +44,6 @@ export class RegisterUserHandler {
     // this.eventBus.publish(event);
 
     // 6. Return public user data (transformed by schema's toJSON)
-    return savedUser.toJSON() as PublicUser;
+    return savedUser.toJSON() as AuthResult;
   }
 }
