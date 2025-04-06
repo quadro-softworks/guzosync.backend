@@ -1,5 +1,6 @@
 // src/core/utils/api-response.ts
-import { Response } from "express";
+import { ApiError } from '@core/errors/api-error';
+import { Response } from 'express';
 
 export class ApiResponse<T> {
   constructor(
@@ -10,22 +11,35 @@ export class ApiResponse<T> {
   ) {}
 }
 
-export function sendSuccess<T>(
-  res: Response,
-  data: T,
-  message: string = "Success",
-  statusCode: number = 200,
-) {
-  res.status(statusCode).json(new ApiResponse<T>(true, message, data));
-}
+export class ResponseHandler {
+  static sendSuccess<T>(
+    res: Response,
+    data: T,
+    message: string = 'Success',
+    statusCode: number = 200,
+  ): void {
+    res.status(statusCode).json(new ApiResponse<T>(true, message, data));
+  }
 
-export function sendError(
-  res: Response,
-  message: string,
-  statusCode: number = 500,
-  errors?: any[],
-) {
-  res
-    .status(statusCode)
-    .json(new ApiResponse<null>(false, message, null, errors));
+  static sendApiError(
+    res: Response,
+    error: ApiError,
+    statusCode: number = 500,
+    errors?: any[],
+  ): void {
+    res
+      .status(error.statusCode || statusCode)
+      .json(new ApiResponse<null>(false, error.message, null, errors));
+  }
+
+  static sendGenericError(
+    res: Response,
+    error: Error,
+    statusCode: number = 500,
+    errors?: any[],
+  ): void {
+    res
+      .status(statusCode)
+      .json(new ApiResponse<null>(false, error.message, null, errors));
+  }
 }
