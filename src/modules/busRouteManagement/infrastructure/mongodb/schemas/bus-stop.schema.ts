@@ -1,51 +1,68 @@
-import { BusStop } from '@core/domain/models/bus-stop.model';
-import { Location } from '@core/domain/valueObjects/location.vo';
 import mongoose, { Schema, Document } from 'mongoose';
+import { IBusStop } from '@core/domain/models/bus-stop.model';
 
-export interface IBusStopDocument
-  extends Omit<BusStop, 'id' | 'location'>,
-    Document {
-  location: Location; // Define type for mongoose
-}
+export interface IBusStopDocument extends Document, Omit<IBusStop, 'id'> {}
 
-// Re-use Location Schema Structure
-const LocationSchemaStructure: Record<keyof Location, any> = {
-  latitude: { type: Number, required: true },
-  longitude: { type: Number, required: true },
-  address: { type: String },
-};
-const LocationSchema = new Schema(LocationSchemaStructure, { _id: false });
-
-const BusStopSchema: Schema<IBusStopDocument> = new Schema(
+const LocationSchema = new Schema(
   {
-    name: { type: String, required: true, trim: true },
-    location: { type: LocationSchema, required: true }, // Embedded Location
-    capacity: { type: Number }, // Max waiting buses
-    isActive: { type: Boolean, default: true, index: true },
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point',
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+    },
+  },
+  { _id: false },
+);
+
+const BusStopSchema = new Schema<IBusStopDocument>(
+  {
+    id: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      unique: true,
+      auto: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    location: {
+      type: LocationSchema,
+      required: true,
+      index: '2dsphere',
+    },
+    capacity: {
+      type: Number,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+      index: true,
+    },
   },
   {
     timestamps: true,
     toJSON: {
-      virtuals: true,
-      transform: (doc, ret) => {
-        ret.id = ret._id;
+      transform(doc, ret) {
+        ret.id = ret._id.toString();
         delete ret._id;
         delete ret.__v;
       },
     },
     toObject: {
-      virtuals: true,
-      transform: (doc, ret) => {
-        ret.id = ret._id;
+      transform(doc, ret) {
+        ret.id = ret._id.toString();
         delete ret._id;
         delete ret.__v;
       },
     },
   },
 );
-
-// Add 2dsphere index for geospatial queries on location
-BusStopSchema.index({ location: '2dsphere' });
 
 export const BusStopModel = mongoose.model<IBusStopDocument>(
   'BusStop',
