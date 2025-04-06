@@ -11,6 +11,8 @@ import registerServices from '@core/di/registerServices';
 import { busRoutes } from '@modules/busRouteManagement/bus.routes';
 import { routesRoutes } from '@modules/busRouteManagement/routes.routes';
 import { controlCenterRoutes } from '@modules/operationsControl/control-center.routes';
+import { mapper } from '@core/mapping/mapper';
+import { registerMapping } from '@core/mapping/registerMapping';
 
 type HttpServer = http.Server<
   typeof http.IncomingMessage,
@@ -26,6 +28,8 @@ const initializeApp = async (): Promise<[Express, HttpServer]> => {
   // --- Express App Setup ---
   const app: Express = express();
   const httpServer = http.createServer(app); // Create HTTP server with Express app
+
+  registerMapping(); // Register mapping profiles for different dtos
 
   registerMiddlewares(app);
 
