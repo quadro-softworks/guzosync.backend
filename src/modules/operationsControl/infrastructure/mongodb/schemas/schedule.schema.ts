@@ -1,40 +1,65 @@
-import { Schedule } from '@core/domain/models/schedule.model';
 import mongoose, { Schema, Document } from 'mongoose';
+import { ISchedule } from '@core/domain/models/schedule.model';
 
-export interface IScheduleDocument extends Omit<Schedule, 'id'>, Document {}
+export interface IScheduleDocument extends Document, Omit<ISchedule, 'id'> {}
 
-const ScheduleSchema: Schema<IScheduleDocument> = new Schema(
+const ScheduleSchema = new Schema<IScheduleDocument>(
   {
+    id: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      unique: true,
+      auto: true,
+    },
     routeId: {
       type: Schema.Types.ObjectId,
       ref: 'Route',
       required: true,
       index: true,
     },
-    // Example: 'WEEKDAYS', 'WEEKENDS', 'MON', '2025-12-25'
-    schedulePattern: { type: String, required: true, index: true },
-    // Example: ["08:00", "08:30", "09:00"] (Timezone assumed UTC or server default)
-    departureTimes: [{ type: String, required: true }],
-    assignedBusId: { type: Schema.Types.ObjectId, ref: 'Bus' },
-    assignedDriverId: { type: Schema.Types.ObjectId, ref: 'User' },
-    validFrom: { type: Date, required: true },
-    validUntil: { type: Date },
-    isActive: { type: Boolean, default: true, index: true },
+    schedulePattern: {
+      type: String,
+      required: true,
+    },
+    departureTimes: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    assignedBusId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Bus',
+    },
+    assignedDriverId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    validFrom: {
+      type: Date,
+      required: true,
+    },
+    validUntil: {
+      type: Date,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+      index: true,
+    },
   },
   {
     timestamps: true,
     toJSON: {
-      virtuals: true,
-      transform: (doc, ret) => {
-        ret.id = ret._id;
+      transform(doc, ret) {
+        ret.id = ret._id.toString();
         delete ret._id;
         delete ret.__v;
       },
     },
     toObject: {
-      virtuals: true,
-      transform: (doc, ret) => {
-        ret.id = ret._id;
+      transform(doc, ret) {
+        ret.id = ret._id.toString();
         delete ret._id;
         delete ret.__v;
       },
