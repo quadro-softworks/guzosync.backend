@@ -1,7 +1,7 @@
+import { ResponseHandler } from './../utils/api-response';
 // src/core/middleware/error-handler.ts
 import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '@core/errors/api-error';
-import { sendError } from '@core/utils/api-response';
 import config from '@core/config';
 
 export const globalErrorHandler = (
@@ -13,13 +13,13 @@ export const globalErrorHandler = (
   console.error('Error occurred:', err); // Log the full error
 
   if (err instanceof ApiError) {
-    sendError(res, err.message, err.statusCode, err.errors);
+    ResponseHandler.sendApiError(res, err, err.statusCode, err.errors);
   } else {
     // Handle unexpected errors
     const message =
       config.nodeEnv === 'development'
         ? err.message
         : 'An unexpected internal server error occurred';
-    sendError(res, message, 500);
+    ResponseHandler.sendGenericError(res, err, 500);
   }
 };
