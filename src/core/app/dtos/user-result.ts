@@ -1,34 +1,33 @@
 import { Role } from '@core/domain/enums/role.enum';
 import { User } from '@core/domain/models/user.model';
-import { Schema } from 'mongoose';
+import { UserId } from '@core/domain/valueObjects';
 
-export type UserResultType = Omit<
-  User,
-  'password' | 'passwordResetToken' | 'passwordResetExpires'
->;
+export interface IUserResult
+  extends Omit<
+    User,
+    'password' | 'passwordResetToken' | 'passwordResetExpires'
+  > {}
 
-// export class UserResult implements UserResultType {
-//   id: Schema.Types.ObjectId;
-//   firstName: string;
-//   lastName: string;
-//   email: string;
-//   role: Role;
-//   phoneNumber: string;
-//   profileImage?: string | undefined;
-//   createdAt: Date;
-//   updatedAt: Date;
-//   isActive: boolean;
+export class UserResult implements IUserResult {
+  id: UserId;
+  firstName: string;
+  lastName: string;
+  isActive: boolean;
+  email: string;
+  phoneNumber: string;
+  role: Role;
+  createdAt: Date;
+  updatedAt: Date;
 
-//   constructor(user: UserResultType) {
-//     this.id = user.id;
-//     this.firstName = user.firstName;
-//     this.lastName = user.lastName;
-//     this.email = user.email;
-//     this.role = user.role;
-//     this.phoneNumber = user.phoneNumber;
-//     this.profileImage = user.profileImage;
-//     this.createdAt = user.createdAt;
-//     this.updatedAt = user.updatedAt;
-//     this.isActive = user.isActive;
-//   }
-// }
+  constructor(user: UserResult) {
+    this.id = user.id;
+    this.firstName = user.firstName;
+    this.lastName = user.lastName;
+    this.isActive = user.isActive;
+    this.email = user.email;
+    this.phoneNumber = user.phoneNumber;
+    this.role = user.role;
+    this.createdAt = user.createdAt;
+    this.updatedAt = user.updatedAt;
+  }
+}
