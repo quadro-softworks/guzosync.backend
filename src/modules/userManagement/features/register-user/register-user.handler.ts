@@ -5,7 +5,7 @@ import { UserModel } from '@modules/userManagement/infrastructure/mongodb/schema
 import { RegisterUserCommand } from './register-user.command';
 import { IHashingService } from '@core/services/hashing.service';
 import { BadRequestError } from '@core/errors/bad-request.error';
-import { AuthResult } from '@core/domain/dtos/auth-result.dto';
+import { AuthResult } from '@core/app/dtos/auth-result.dto';
 // Optional: Import event bus if publishing an event
 // import { IEventBus } from '@core/events/event-bus';
 

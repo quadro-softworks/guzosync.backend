@@ -5,7 +5,7 @@ import { IHashingService } from '@core/services/hashing.service';
 import { IJwtService, IJwtPayload } from '@core/services/jwt.service';
 import { UnauthorizedError } from '@core/errors/unauthorized.error';
 import { UserModel } from '@modules/userManagement/infrastructure/mongodb/schemas/user.schema';
-import { AuthResult } from '@core/domain/dtos/auth-result.dto';
+import { AuthResult } from '@core/app/dtos/auth-result.dto';
 
 @injectable()
 export class LoginUserHandler {

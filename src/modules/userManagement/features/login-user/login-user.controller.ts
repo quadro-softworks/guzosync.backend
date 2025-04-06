@@ -2,8 +2,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { injectable } from 'tsyringe';
 import { LoginUserHandler } from './login-user.handler';
-import { sendSuccess } from '@core/utils/api-response';
 import { appContainer } from '@core/di/container';
+import { ResponseHandler } from '@core/utils/api-response';
 
 @injectable()
 export class LoginUserController {
@@ -23,7 +23,7 @@ export class LoginUserController {
         sameSite: 'none',
         maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days before asking for login again
       });
-      sendSuccess(res, loginResult, 'Login successful');
+      ResponseHandler.sendSuccess(res, loginResult, 'Login successful');
     } catch (error) {
       // Handles UnauthorizedError from the handler
       next(error);

@@ -1,7 +1,7 @@
 // src/modules/userManagement/features/logout-user/logout-user.controller.ts
 import { Request, Response, NextFunction } from 'express';
 import { injectable } from 'tsyringe';
-import { sendSuccess } from '@core/utils/api-response';
+import { ResponseHandler } from '@core/utils/api-response';
 
 @injectable()
 export class LogoutUserController {
@@ -14,7 +14,11 @@ export class LogoutUserController {
     try {
       // Server-side logic would go here if blacklisting tokens
       // For now, just acknowledge the request. The client clears the token.
-      sendSuccess(res, null, 'Logout successful. Please discard your token.');
+      ResponseHandler.sendSuccess(
+        res,
+        null,
+        'Logout successful. Please discard your token.',
+      );
     } catch (error) {
       next(error);
     }

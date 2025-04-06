@@ -1,5 +1,5 @@
 // src/modules/user-management/features/login-user/login-user.command.ts
-import { AuthResult } from '@core/domain/dtos/auth-result.dto';
+import { AuthResult } from '@core/app/dtos/auth-result.dto';
 import { z } from 'zod';
 
 export const LoginUserSchema = z.object({

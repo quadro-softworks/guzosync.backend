@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { injectable } from 'tsyringe';
 import { RegisterUserHandler } from './register-user.handler';
-import { sendSuccess } from '@core/utils/api-response';
 import { appContainer } from '@core/di/container';
+import { ResponseHandler } from '@core/utils/api-response';
 
 @injectable()
 export class RegisterUserController {
@@ -16,7 +16,12 @@ export class RegisterUserController {
     try {
       const command = req.body;
       const createdUser = await this.handler.execute(command);
-      sendSuccess(res, createdUser, 'User registered successfully', 201);
+      ResponseHandler.sendSuccess(
+        res,
+        createdUser,
+        'User registered successfully',
+        201,
+      );
     } catch (error) {
       next(error);
     }
