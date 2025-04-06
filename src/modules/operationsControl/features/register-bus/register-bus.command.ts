@@ -1,5 +1,4 @@
 import { BusType } from '@core/domain/enums/bus-type.enum';
-import { DefaultBusCapacity } from '@core/domain/models/bus.model';
 import { z } from 'zod';
 
 export const RegisterBusCommandSchema = z.object({
@@ -12,7 +11,7 @@ export const RegisterBusCommandSchema = z.object({
       'Invalid Licence Plate. Valid Example: A12345, B12345, etc.',
     ),
   busType: z.nativeEnum(BusType),
-  capacity: z.number().int().positive().optional().default(DefaultBusCapacity),
+  capacity: z.number().int().positive().optional(),
   assignedRouteId: z.string().optional(), // Will be cast to RouteId
   assignedDriverId: z.string().optional(), // Will be cast to UserId
   manufactureYear: z
@@ -24,4 +23,4 @@ export const RegisterBusCommandSchema = z.object({
   model: z.string().optional(),
 });
 
-export type RegisterBusCommand = z.infer<typeof RegisterBusCommandSchema>;
+export type RegisterBusCommand = z.input<typeof RegisterBusCommandSchema>;

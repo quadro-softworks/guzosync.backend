@@ -42,7 +42,7 @@ export class GetRouteDetailsHandler {
     );
 
     const response: RouteDetailsResponse = {
-      id: route._id.toString(),
+      id: route.id.toString(),
       name: route.name,
       description: route.description,
       totalDistance: route.totalDistance,

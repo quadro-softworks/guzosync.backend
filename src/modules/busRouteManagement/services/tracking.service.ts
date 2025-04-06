@@ -1,3 +1,4 @@
+import { plainToClass } from 'class-transformer';
 import { BusStatus } from '@core/domain/enums/bus-status.enum';
 import { Location } from '@core/domain/valueObjects/location.vo';
 import { BusModel } from '@modules/busRouteManagement/infrastructure/mongodb/schemas/bus.schema';
@@ -6,19 +7,11 @@ import {
   IETAService,
 } from '@modules/busRouteManagement/services/eta.service';
 import { injectable, inject } from 'tsyringe';
-
-// Define the structure of the update payload
-export interface BusLocationUpdate {
-  busId: string;
-  location: Location | null; // Location might be null if bus inactive
-  routeId: string | null;
-  status: BusStatus;
-  etas: { stopId: string; etaMinutes: number | null }[]; // Calculated ETAs for relevant stops
-}
+import { BusLocationUpdateResult } from '@core/app/dtos/bus-location-update-result.dto';
 
 export interface ITrackingService {
-  getBusUpdatesForRoute(routeId: string): Promise<BusLocationUpdate[]>;
-  getBusDetailsWithETA(busId: string): Promise<BusLocationUpdate | null>; // For REST API
+  getBusUpdatesForRoute(routeId: string): Promise<BusLocationUpdateResult[]>;
+  getBusDetailsWithETA(busId: string): Promise<BusLocationUpdateResult | null>; // For REST API
 }
 
 export const ITrackingServiceMeta = { name: 'ITrackingService' };
@@ -27,7 +20,9 @@ export const ITrackingServiceMeta = { name: 'ITrackingService' };
 export class TrackingService implements ITrackingService {
   constructor(@inject(IETAServiceMeta.name) private etaService: IETAService) {}
 
-  async getBusUpdatesForRoute(routeId: string): Promise<BusLocationUpdate[]> {
+  async getBusUpdatesForRoute(
+    routeId: string,
+  ): Promise<BusLocationUpdateResult[]> {
     // Find active buses currently assigned to this route
     const buses = await BusModel.find({
       assignedRouteId: routeId,
@@ -35,26 +30,25 @@ export class TrackingService implements ITrackingService {
       currentLocation: { $ne: null }, // Only buses with a location
     }).select('currentLocation assignedRouteId busStatus'); // Select necessary fields
 
-    const updates: BusLocationUpdate[] = [];
+    const updates: BusLocationUpdateResult[] = [];
     for (const bus of buses) {
-      if (bus.currentLocation && bus.assignedRouteId) {
+      if (bus.currentLocation && bus.assignedRouteId && bus.currentLocation) {
         const etas = await this.etaService.calculateRouteETAs(
           bus.assignedRouteId.toString(),
           bus.currentLocation,
         );
         updates.push({
-          busId: bus._id.toString(),
-          location: bus.currentLocation,
-          routeId: bus.assignedRouteId.toString(),
-          status: bus.busStatus,
-          etas: etas,
+          ...plainToClass(BusLocationUpdateResult, bus),
+          etas,
         });
       }
     }
     return updates;
   }
 
-  async getBusDetailsWithETA(busId: string): Promise<BusLocationUpdate | null> {
+  async getBusDetailsWithETA(
+    busId: string,
+  ): Promise<BusLocationUpdateResult | null> {
     const bus = await BusModel.findById(busId).select(
       'currentLocation assignedRouteId busStatus',
     );
@@ -74,12 +68,6 @@ export class TrackingService implements ITrackingService {
       );
     }
 
-    return {
-      busId: bus._id.toString(),
-      location: bus.currentLocation ?? null,
-      routeId: bus.assignedRouteId?.toString() ?? null,
-      status: bus.busStatus,
-      etas: etas,
-    };
+    return { ...plainToClass(BusLocationUpdateResult, bus), etas };
   }
 }

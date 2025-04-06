@@ -1,8 +1,8 @@
+import { BusLocationUpdateResult } from '@core/app/dtos/bus-location-update-result.dto';
 import { Bus } from '@core/domain/models/bus.model';
 import { NotFoundError } from '@core/errors/not-found.error';
 import { BusModel } from '@modules/busRouteManagement/infrastructure/mongodb/schemas/bus.schema';
 import {
-  BusLocationUpdate,
   ITrackingServiceMeta,
   ITrackingService,
 } from '@modules/busRouteManagement/services/tracking.service';
@@ -12,7 +12,7 @@ import { injectable, inject } from 'tsyringe';
 export type BusDetailsResponse = Omit<Bus, 'id'> & {
   id: string;
   routeName?: string;
-  etaInfo?: Omit<BusLocationUpdate, 'busId' | 'routeId' | 'status'>; // Reuse location/ETA structure
+  etaInfo?: Omit<BusLocationUpdateResult, 'busId' | 'routeId' | 'status'>; // Reuse location/ETA structure
 };
 
 @injectable()
@@ -38,7 +38,7 @@ export class GetBusDetailsHandler {
     // Combine data
     const response: BusDetailsResponse = {
       ...(bus.toJSON() as any), // Use transformed bus data
-      id: bus._id.toString(),
+      id: bus.id.toString(),
       routeName: (bus.assignedRouteId as any)?.name ?? undefined, // Extract populated name safely
       etaInfo: trackingInfo
         ? { location: trackingInfo.location, etas: trackingInfo.etas }

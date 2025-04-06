@@ -7,7 +7,6 @@ export const RegisterPersonnelCommandSchema = z.object({
   role: z.enum([Role.BusDriver, Role.QueueRegulator]), // Example roles
   email: z.string().email(),
   phone: z.string().min(10).max(15),
-  assignedBusId: z.string().optional(), // Optional, assigned only for BusDrivers
 });
 
 export type RegisterPersonnelCommand = z.infer<

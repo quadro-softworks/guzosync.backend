@@ -2,6 +2,7 @@ import { BusStatus } from '@core/domain/enums/bus-status.enum';
 import { BusType } from '@core/domain/enums/bus-type.enum';
 import { Bus } from '@core/domain/models/bus.model';
 import { BusId, RouteId, UserId } from '@core/domain/valueObjects';
+import { Location } from '@core/domain/valueObjects/location.vo';
 
 export interface IBusResult extends Bus {}
 

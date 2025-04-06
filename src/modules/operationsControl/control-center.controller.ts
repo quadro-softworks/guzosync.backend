@@ -1,6 +1,6 @@
+import { ResponseHandler } from './../../core/utils/api-response';
 import { injectable } from 'tsyringe';
 import { Request, Response, NextFunction } from 'express';
-import { sendSuccess } from '@core/utils/api-response';
 import { appContainer } from '@core/di/container';
 
 import { RegisterBusHandler } from './features/register-bus/register-bus.handler';
@@ -58,7 +58,9 @@ export class ControlCenterController {
     try {
       const busCommand = req.body;
       const bus = await this.registerBusHandler.execute(busCommand);
-      sendSuccess(res, bus, 'Bus created successfully.');
+      if (bus.isErr()) {
+        ResponseHandler.sendApiError(res, bus.error);
+      } else ResponseHandler.sendSuccess(res, bus, 'Bus created successfully.');
     } catch (error) {
       next(error);
     }
@@ -72,7 +74,14 @@ export class ControlCenterController {
     try {
       const command = req.body;
       const result = await this.registerPersonnelHandler.execute(command);
-      sendSuccess(res, result, 'Personnel registered successfully.');
+      if (result.isErr()) {
+        ResponseHandler.sendApiError(res, result.error);
+      } else
+        ResponseHandler.sendSuccess(
+          res,
+          result,
+          'Personnel registered successfully.',
+        );
     } catch (error) {
       next(error);
     }
@@ -86,7 +95,7 @@ export class ControlCenterController {
   //   try {
   //     const filters = req.query;
   //     const result = await this.getQueueRegulatorsHandler.execute(filters);
-  //     sendSuccess(res, result, 'Queue regulators fetched successfully.');
+  //     ResponseHandler.sendSuccess(res, result, 'Queue regulators fetched successfully.');
   //   } catch (error) {
   //     next(error);
   //   }
@@ -101,7 +110,7 @@ export class ControlCenterController {
   //     const result = await this.getQueueRegulatorByIdHandler.execute(
   //       req.params.regulatorId,
   //     );
-  //     sendSuccess(res, result, 'Queue regulator details fetched successfully.');
+  //     ResponseHandler.sendSuccess(res, result, 'Queue regulator details fetched successfully.');
   //   } catch (error) {
   //     next(error);
   //   }
@@ -117,7 +126,7 @@ export class ControlCenterController {
   //       regulatorId: req.params.regulatorId,
   //       ...req.body,
   //     });
-  //     sendSuccess(res, result, 'Queue regulator updated successfully.');
+  //     ResponseHandler.sendSuccess(res, result, 'Queue regulator updated successfully.');
   //   } catch (error) {
   //     next(error);
   //   }
@@ -132,7 +141,7 @@ export class ControlCenterController {
   //     const result = await this.deleteQueueRegulatorHandler.execute(
   //       req.params.regulatorId,
   //     );
-  //     sendSuccess(res, result, 'Queue regulator removed successfully.');
+  //     ResponseHandler.sendSuccess(res, result, 'Queue regulator removed successfully.');
   //   } catch (error) {
   //     next(error);
   //   }
@@ -149,7 +158,7 @@ export class ControlCenterController {
   //       regulatorId,
   //       busStopId,
   //     });
-  //     sendSuccess(res, result, 'Queue regulator assigned to bus stop.');
+  //     ResponseHandler.sendSuccess(res, result, 'Queue regulator assigned to bus stop.');
   //   } catch (error) {
   //     next(error);
   //   }
@@ -163,7 +172,7 @@ export class ControlCenterController {
   //   try {
   //     const filters = req.query;
   //     const result = await this.getBusDriversHandler.execute(filters);
-  //     sendSuccess(res, result, 'Bus drivers fetched successfully.');
+  //     ResponseHandler.sendSuccess(res, result, 'Bus drivers fetched successfully.');
   //   } catch (error) {
   //     next(error);
   //   }
@@ -178,7 +187,7 @@ export class ControlCenterController {
   //     const result = await this.getBusDriverByIdHandler.execute(
   //       req.params.driverId,
   //     );
-  //     sendSuccess(res, result, 'Bus driver details fetched successfully.');
+  //     ResponseHandler.sendSuccess(res, result, 'Bus driver details fetched successfully.');
   //   } catch (error) {
   //     next(error);
   //   }
@@ -194,7 +203,7 @@ export class ControlCenterController {
   //       driverId: req.params.driverId,
   //       ...req.body,
   //     });
-  //     sendSuccess(res, result, 'Bus driver updated successfully.');
+  //     ResponseHandler.sendSuccess(res, result, 'Bus driver updated successfully.');
   //   } catch (error) {
   //     next(error);
   //   }
@@ -209,7 +218,7 @@ export class ControlCenterController {
   //     const result = await this.deleteBusDriverHandler.execute(
   //       req.params.driverId,
   //     );
-  //     sendSuccess(res, result, 'Bus driver removed successfully.');
+  //     ResponseHandler.sendSuccess(res, result, 'Bus driver removed successfully.');
   //   } catch (error) {
   //     next(error);
   //   }
@@ -226,7 +235,7 @@ export class ControlCenterController {
   //       driverId,
   //       busId,
   //     });
-  //     sendSuccess(res, result, 'Bus assigned to driver successfully.');
+  //     ResponseHandler.sendSuccess(res, result, 'Bus assigned to driver successfully.');
   //   } catch (error) {
   //     next(error);
   //   }

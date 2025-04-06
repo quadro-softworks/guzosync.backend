@@ -1,3 +1,4 @@
+import { RegisterPersonnelCommandSchema } from './features/personnel/register-personnel/register-personnel.command';
 import { Router } from 'express';
 import { ControlCenterController } from '@modules/operationsControl/control-center.controller';
 import { validateRequest } from '@core/middleware/validate-request';
@@ -11,22 +12,16 @@ const controlCenterRoutes = (router: Router) => {
 
   router.post(
     '/buses/register',
-    (req, res, next) => {
-      console.log('Request Body:', req.body); // Log the request body
-      console.log('Request Params:', req.params); // Log the request body
-      console.log('Request Query:', req.query); // Log the request body
-      next();
-    },
     validateRequest(RegisterBusCommandSchema),
     ccc.registerBus,
   );
 
-  // // ✅ PERSONNEL REGISTRATION
-  // router.post(
-  //   '/personnel/register',
-  //   validateRequest(/* RegisterPersonnelCommandSchema */),
-  //   ccc.registerPersonnel
-  // );
+  // ✅ PERSONNEL REGISTRATION
+  router.post(
+    '/personnel/register',
+    validateRequest(RegisterPersonnelCommandSchema),
+    ccc.registerPersonnel,
+  );
 
   // // ✅ QUEUE REGULATORS
   // router.get('/personnel/queue-regulators', ccc.getQueueRegulators); // Add filter/pagination middleware if needed

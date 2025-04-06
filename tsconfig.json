@@ -14,7 +14,8 @@
     "paths": {
       "@core/*": ["core/*"],
       "@modules/*": ["modules/*"]
-    }
+    },
+    "plugins": [{ "transform": "@automapper/classes/transformer-plugin" }]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
