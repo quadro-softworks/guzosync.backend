@@ -1,12 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { User } from '@core/domain/models/user.model';
+import { IUser, User } from '@core/domain/models/user.model';
 import { Role } from '@core/domain/enums/role.enum';
 
-// export interface IUserDocument extends User, Document {
-//   id: string; // Ensure id is string after transformation
-// }
+export interface IUserDocument extends Document, Omit<IUser, 'id'> {}
 
-const UserSchema = new Schema<User>(
+const UserSchema = new Schema<IUserDocument>(
   {
     id: {
       type: Schema.Types.ObjectId,
@@ -24,6 +22,8 @@ const UserSchema = new Schema<User>(
     password: { type: String, required: true, select: false }, // Crucial: Don't select password by default
     firstName: { type: String, required: false, trim: true },
     lastName: { type: String, required: false, trim: true },
+    // Add isActive for soft delete
+    isActive: { type: Boolean, default: true, index: true },
     passwordResetToken: {
       type: String,
       select: false, // Don't include by default in queries
@@ -55,4 +55,4 @@ const UserSchema = new Schema<User>(
   },
 );
 
-export const UserModel = mongoose.model<User>('User', UserSchema);
+export const UserModel = mongoose.model<IUserDocument>('User', UserSchema);
