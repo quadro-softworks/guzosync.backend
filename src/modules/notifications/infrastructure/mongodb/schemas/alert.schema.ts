@@ -1,39 +1,66 @@
-import { AlertSeverity } from '@core/domain/enums/alert-severity.enum';
-import { Alert } from '@core/domain/models/alert.model';
 import mongoose, { Schema, Document } from 'mongoose';
+import { IAlert } from '@core/domain/models/alert.model';
+import { AlertSeverity } from '@core/domain/enums/alert-severity.enum';
 
-export interface IAlertDocument extends Omit<Alert, 'id'>, Document {}
+export interface IAlertDocument extends Document, Omit<IAlert, 'id'> {}
 
 const AlertSchema = new Schema<IAlertDocument>(
   {
-    title: { type: String, required: true },
+    id: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      unique: true,
+      auto: true,
+    },
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     severity: {
       type: String,
-      enum: AlertSeverity,
+      enum: Object.values(AlertSeverity),
       required: true,
-      default: AlertSeverity.INFO,
     },
-    description: { type: String, required: true },
-    affectedRouteIds: [{ type: Schema.Types.ObjectId, ref: 'Route' }],
-    affectedBusStopIds: [{ type: Schema.Types.ObjectId, ref: 'BusStop' }],
-    activeFrom: { type: Date, required: true, default: Date.now },
-    activeUntil: { type: Date }, // Optional expiry
-    createdByUserId: { type: Schema.Types.ObjectId, ref: 'User' }, // Optional: who created it
+    description: {
+      type: String,
+      required: true,
+    },
+    affectedRouteIds: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Route',
+      },
+    ],
+    affectedBusStopIds: [
+      {
+        type: String,
+      },
+    ],
+    activeFrom: {
+      type: Date,
+      required: true,
+    },
+    activeUntil: {
+      type: Date,
+    },
+    createdByUserId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
   },
   {
     timestamps: true,
     toJSON: {
-      virtuals: true,
-      transform: (doc, ret) => {
-        ret.id = ret._id;
+      transform(doc, ret) {
+        ret.id = ret._id.toString();
         delete ret._id;
         delete ret.__v;
       },
     },
     toObject: {
-      virtuals: true,
-      transform: (doc, ret) => {
-        ret.id = ret._id;
+      transform(doc, ret) {
+        ret.id = ret._id.toString();
         delete ret._id;
         delete ret.__v;
       },
