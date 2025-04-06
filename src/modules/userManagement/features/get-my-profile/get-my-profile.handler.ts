@@ -1,7 +1,7 @@
 import { injectable } from 'tsyringe';
 import { NotFoundError } from '@core/errors/not-found.error';
 import { UserModel } from '@modules/userManagement/infrastructure/mongodb/schemas/user.schema';
-import { ProfileResult } from '@core/domain/dtos/profile-result.dto';
+import { ProfileResult } from '@core/app/dtos/profile-result.dto';
 
 @injectable()
 export class GetMyProfileHandler {

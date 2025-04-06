@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { injectable } from 'tsyringe';
 import { GetMyProfileHandler } from './get-my-profile.handler';
-import { sendSuccess } from '@core/utils/api-response';
+import { ResponseHandler } from '@core/utils/api-response';
 import { appContainer } from '@core/di/container';
 import { UnauthorizedError } from '@core/errors/unauthorized.error';
 
@@ -21,7 +21,11 @@ export class GetMyProfileController {
       }
       const userId = req.user.userId;
       const userProfile = await this.handler.execute(userId);
-      sendSuccess(res, userProfile, 'Profile fetched successfully.');
+      ResponseHandler.sendSuccess(
+        res,
+        userProfile,
+        'Profile fetched successfully.',
+      );
     } catch (error) {
       next(error); // Catches NotFoundError etc.
     }
