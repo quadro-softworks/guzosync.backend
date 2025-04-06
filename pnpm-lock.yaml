@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@automapper/classes':
+        specifier: ^8.8.1
+        version: 8.8.1(@automapper/core@8.8.1)(reflect-metadata@0.2.2)
+      '@automapper/core':
+        specifier: ^8.8.1
+        version: 8.8.1
       '@types/express':
         specifier: ^5.0.1
         version: 5.0.1
@@ -17,6 +23,9 @@ importers:
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
       dotenv:
         specifier: ^16.4.7
         version: 16.4.7
@@ -113,6 +122,17 @@ importers:
         version: 8.29.0(eslint@9.23.0)(typescript@5.8.2)
 
 packages:
+
+  '@automapper/classes@8.8.1':
+    resolution: {integrity: sha512-qWP92Vz4z5zGWVXVkoGKmI9PIiAh8uhTBcKpKMmTVwmS1wfOQgj3ceD+A3mlC9ZUTohwvXebS3M30scLaUZmeg==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@automapper/core': 8.8.1
+      reflect-metadata: ~0.1.13
+
+  '@automapper/core@8.8.1':
+    resolution: {integrity: sha512-VIRULNAImqaTojp8zqhVGVimjxjriawqZWlemooWh5B5tX2XlgA6icPrQBQh+M9wY8IVQipBTOcr338N9lf8RA==}
+    engines: {node: '>=16.0.0'}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -468,6 +488,9 @@ packages:
   chownr@2.0.0:
     resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
     engines: {node: '>=10'}
+
+  class-transformer@0.5.1:
+    resolution: {integrity: sha512-SQa1Ws6hUbfC98vKGxZH3KFY0Y1lm5Zm0SY8XX9zbK7FJCyVEac3ATW0RIpwzW+oOfmHE5PMPufDG9hCfoEOMw==}
 
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
@@ -1526,6 +1549,13 @@ packages:
 
 snapshots:
 
+  '@automapper/classes@8.8.1(@automapper/core@8.8.1)(reflect-metadata@0.2.2)':
+    dependencies:
+      '@automapper/core': 8.8.1
+      reflect-metadata: 0.2.2
+
+  '@automapper/core@8.8.1': {}
+
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
@@ -1937,6 +1967,8 @@ snapshots:
       fsevents: 2.3.3
 
   chownr@2.0.0: {}
+
+  class-transformer@0.5.1: {}
 
   color-convert@2.0.1:
     dependencies:
