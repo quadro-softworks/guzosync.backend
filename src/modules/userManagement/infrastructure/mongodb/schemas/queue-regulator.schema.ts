@@ -1,31 +1,27 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IQueueRegulator } from '@core/domain/models/queue-regulator.model';
 
+// Applied the reversed Omit pattern here
 export interface IQueueRegulatorDocument
-  extends Document,
-    Omit<IQueueRegulator, 'id'> {}
+  extends Omit<Document, 'id'>,
+    IQueueRegulator {}
 
 const QueueRegulatorSchema = new Schema<IQueueRegulatorDocument>(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      unique: true,
-      auto: true,
-    },
+    // id is managed by Mongoose (_id) and transforms
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      unique: true,
+      unique: true, // Ensure one user cannot be a regulator multiple times
     },
     assignedStopId: {
       type: Schema.Types.ObjectId,
       ref: 'BusStop',
     },
-    // incidentReports: [{
-    //   type: Schema.Types.ObjectId,
-    //   ref: 'Incident',
+    // incidentReports: [{ // Uncomment if IQueueRegulator defines this
+    //  type: Schema.Types.ObjectId,
+    //  ref: 'Incident',
     // }],
   },
   {

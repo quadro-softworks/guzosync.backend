@@ -1,24 +1,21 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IControlCenterAdmin } from '@core/domain/models/control-center-admin.model';
 
+// Applied the reversed Omit pattern here
 export interface IControlCenterAdminDocument
-  extends Document,
-    Omit<IControlCenterAdmin, 'id'> {}
+  extends Omit<Document, 'id'>,
+    IControlCenterAdmin {}
 
 const ControlCenterAdminSchema = new Schema<IControlCenterAdminDocument>(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      unique: true,
-      auto: true,
-    },
+    // id is managed by Mongoose (_id) and transforms
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      unique: true,
+      unique: true, // Ensure one user cannot be an admin multiple times
     },
+    // Add other admin-specific fields from IControlCenterAdmin if any
   },
   {
     timestamps: true,

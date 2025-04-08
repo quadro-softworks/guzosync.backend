@@ -1,16 +1,12 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { ISchedule } from '@core/domain/models/schedule.model';
 
-export interface IScheduleDocument extends Document, Omit<ISchedule, 'id'> {}
+// Applied the reversed Omit pattern here
+export interface IScheduleDocument extends Omit<Document, 'id'>, ISchedule {}
 
 const ScheduleSchema = new Schema<IScheduleDocument>(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      unique: true,
-      auto: true,
-    },
+    // id is managed by Mongoose (_id) and transforms
     routeId: {
       type: Schema.Types.ObjectId,
       ref: 'Route',
@@ -23,7 +19,7 @@ const ScheduleSchema = new Schema<IScheduleDocument>(
     },
     departureTimes: [
       {
-        type: String,
+        type: String, // Assuming times are stored as strings like "HH:MM"
         required: true,
       },
     ],

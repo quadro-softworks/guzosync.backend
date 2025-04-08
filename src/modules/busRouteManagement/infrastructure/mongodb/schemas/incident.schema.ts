@@ -2,8 +2,10 @@ import mongoose, { Schema, Document } from 'mongoose';
 import { IIncident } from '@core/domain/models/incident.model';
 import { IncidentSeverity } from '@core/domain/enums/incident-severity.enum';
 
-export interface IIncidentDocument extends Document, Omit<IIncident, 'id'> {}
+// Applied the reversed Omit pattern here
+export interface IIncidentDocument extends Omit<Document, 'id'>, IIncident {}
 
+// Define LocationSchema for reuse if not already globally defined
 const LocationSchema = new Schema(
   {
     type: {
@@ -12,7 +14,7 @@ const LocationSchema = new Schema(
       default: 'Point',
     },
     coordinates: {
-      type: [Number],
+      type: [Number], // [longitude, latitude]
       required: true,
     },
   },
@@ -21,12 +23,7 @@ const LocationSchema = new Schema(
 
 const IncidentSchema = new Schema<IIncidentDocument>(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      unique: true,
-      auto: true,
-    },
+    // id is managed by Mongoose (_id) and transforms
     reportedByUserId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -36,7 +33,7 @@ const IncidentSchema = new Schema<IIncidentDocument>(
       type: String,
       required: true,
     },
-    location: LocationSchema,
+    location: LocationSchema, // Embed the location sub-schema
     relatedBusId: {
       type: Schema.Types.ObjectId,
       ref: 'Bus',
@@ -63,6 +60,7 @@ const IncidentSchema = new Schema<IIncidentDocument>(
     toJSON: {
       transform(doc, ret) {
         ret.id = ret._id.toString();
+        // Optionally transform location coordinates if needed
         delete ret._id;
         delete ret.__v;
       },
@@ -70,12 +68,16 @@ const IncidentSchema = new Schema<IIncidentDocument>(
     toObject: {
       transform(doc, ret) {
         ret.id = ret._id.toString();
+        // Optionally transform location coordinates if needed
         delete ret._id;
         delete ret.__v;
       },
     },
   },
 );
+
+// Create geospatial index if querying by location
+IncidentSchema.index({ location: '2dsphere' });
 
 export const IncidentModel = mongoose.model<IIncidentDocument>(
   'Incident',

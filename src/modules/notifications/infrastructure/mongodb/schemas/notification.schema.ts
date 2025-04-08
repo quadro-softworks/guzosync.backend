@@ -2,9 +2,10 @@ import mongoose, { Schema, Document } from 'mongoose';
 import { INotification } from '@core/domain/models/notification.model';
 import { NotificationType } from '@core/domain/enums/notification-type.enum';
 
+// Applied the reversed Omit pattern here
 export interface INotificationDocument
-  extends Document,
-    Omit<INotification, 'id'> {}
+  extends Omit<Document, 'id'>,
+    INotification {}
 
 const RelatedEntitySchema = new Schema(
   {
@@ -13,7 +14,7 @@ const RelatedEntitySchema = new Schema(
       required: true,
     },
     entityId: {
-      type: String,
+      type: String, // Keep as String to accommodate different ID types (ObjectId, string)
       required: true,
     },
   },
@@ -22,12 +23,7 @@ const RelatedEntitySchema = new Schema(
 
 const NotificationSchema = new Schema<INotificationDocument>(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      unique: true,
-      auto: true,
-    },
+    // id is managed by Mongoose (_id) and transforms
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -52,7 +48,7 @@ const NotificationSchema = new Schema<INotificationDocument>(
       default: false,
       index: true,
     },
-    relatedEntity: RelatedEntitySchema,
+    relatedEntity: RelatedEntitySchema, // Embed the sub-schema
   },
   {
     timestamps: true,

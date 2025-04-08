@@ -1,16 +1,12 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IRoute } from '@core/domain/models/route.model';
 
-export interface IRouteDocument extends Document, Omit<IRoute, 'id'> {}
+// Applied the reversed Omit pattern here
+export interface IRouteDocument extends Omit<Document, 'id'>, IRoute {}
 
 const RouteSchema = new Schema<IRouteDocument>(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      unique: true,
-      auto: true,
-    },
+    // id is managed by Mongoose (_id) and transforms
     name: {
       type: String,
       required: true,
@@ -21,7 +17,7 @@ const RouteSchema = new Schema<IRouteDocument>(
     },
     stopIds: [
       {
-        type: Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId, // Assuming BusStop ID is ObjectId
         ref: 'BusStop',
         required: true,
       },
@@ -30,7 +26,7 @@ const RouteSchema = new Schema<IRouteDocument>(
       type: Number,
     },
     estimatedDuration: {
-      type: Number,
+      type: Number, // Consider storing in seconds or minutes consistently
     },
     isActive: {
       type: Boolean,

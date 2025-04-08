@@ -1,16 +1,12 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IFeedback } from '@core/domain/models/feedback.model';
 
-export interface IFeedbackDocument extends Document, Omit<IFeedback, 'id'> {}
+// Applied the reversed Omit pattern here
+export interface IFeedbackDocument extends Omit<Document, 'id'>, IFeedback {}
 
 const FeedbackSchema = new Schema<IFeedbackDocument>(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      unique: true,
-      auto: true,
-    },
+    // id is managed by Mongoose (_id) and transforms
     submittedByUserId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -26,11 +22,11 @@ const FeedbackSchema = new Schema<IFeedbackDocument>(
       max: 5,
     },
     relatedTripId: {
-      type: String,
+      type: Schema.Types.ObjectId, // Change if Trip ID is string in domain
       ref: 'Trip',
     },
     relatedBusId: {
-      type: String,
+      type: Schema.Types.ObjectId, // Change if Bus ID is string in domain
       ref: 'Bus',
     },
   },

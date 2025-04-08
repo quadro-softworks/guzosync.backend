@@ -2,16 +2,12 @@ import mongoose, { Schema, Document } from 'mongoose';
 import { ITrip } from '@core/domain/models/trip.model';
 import { TripStatus } from '@core/domain/enums/trip-status.enum';
 
-export interface ITripDocument extends Document, Omit<ITrip, 'id'> {}
+// Applied the reversed Omit pattern here
+export interface ITripDocument extends Omit<Document, 'id'>, ITrip {}
 
 const TripSchema = new Schema<ITripDocument>(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      unique: true,
-      auto: true,
-    },
+    // id is managed by Mongoose (_id) and transforms
     busId: {
       type: Schema.Types.ObjectId,
       ref: 'Bus',
@@ -30,8 +26,8 @@ const TripSchema = new Schema<ITripDocument>(
       index: true,
     },
     scheduleId: {
-      type: String,
-      ref: 'Schedule',
+      type: String, // Assuming Schedule ID in the domain model is string
+      // If Schedule ID is ObjectId, change type: Schema.Types.ObjectId and ref: 'Schedule'
     },
     actualDepartureTime: {
       type: Date,
@@ -56,11 +52,11 @@ const TripSchema = new Schema<ITripDocument>(
     ],
     feedbackIds: [
       {
-        type: Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId, // Assuming Feedback ID is ObjectId
         ref: 'Feedback',
       },
     ],
-    // waypoints: [LocationSchema],
+    // waypoints: [LocationSchema], // Uncomment and define LocationSchema if needed
   },
   {
     timestamps: true,

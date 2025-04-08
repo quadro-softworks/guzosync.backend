@@ -1,8 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IBusStop } from '@core/domain/models/bus-stop.model';
 
-export interface IBusStopDocument extends Document, Omit<IBusStop, 'id'> {}
+// Applied the reversed Omit pattern here
+export interface IBusStopDocument extends Omit<Document, 'id'>, IBusStop {}
 
+// Define LocationSchema for reuse if not already globally defined
 const LocationSchema = new Schema(
   {
     type: {
@@ -11,7 +13,7 @@ const LocationSchema = new Schema(
       default: 'Point',
     },
     coordinates: {
-      type: [Number],
+      type: [Number], // [longitude, latitude]
       required: true,
     },
   },
@@ -20,21 +22,16 @@ const LocationSchema = new Schema(
 
 const BusStopSchema = new Schema<IBusStopDocument>(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      unique: true,
-      auto: true,
-    },
+    // id is managed by Mongoose (_id) and transforms
     name: {
       type: String,
       required: true,
       trim: true,
     },
     location: {
-      type: LocationSchema,
+      type: LocationSchema, // Embed the location sub-schema
       required: true,
-      index: '2dsphere',
+      index: '2dsphere', // Geospatial index
     },
     capacity: {
       type: Number,
@@ -44,12 +41,14 @@ const BusStopSchema = new Schema<IBusStopDocument>(
       default: true,
       index: true,
     },
+    // Add other fields from IBusStop like amenities if needed
   },
   {
     timestamps: true,
     toJSON: {
       transform(doc, ret) {
         ret.id = ret._id.toString();
+        // Optionally transform location coordinates if needed
         delete ret._id;
         delete ret.__v;
       },
@@ -57,6 +56,7 @@ const BusStopSchema = new Schema<IBusStopDocument>(
     toObject: {
       transform(doc, ret) {
         ret.id = ret._id.toString();
+        // Optionally transform location coordinates if needed
         delete ret._id;
         delete ret.__v;
       },

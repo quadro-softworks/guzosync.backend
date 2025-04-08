@@ -1,10 +1,12 @@
+import mongoose, { Schema, Document } from 'mongoose';
 import { IBus } from '@core/domain/models/bus.model';
 import { BusStatus } from '@core/domain/enums/bus-status.enum';
 import { BusType } from '@core/domain/enums/bus-type.enum';
-import mongoose, { Schema, Document } from 'mongoose';
 
-export interface IBusDocument extends Document, Omit<IBus, 'id'> {}
+// Applied the reversed Omit pattern here
+export interface IBusDocument extends Omit<Document, 'id'>, IBus {}
 
+// Define LocationSchema for reuse if not already globally defined
 const LocationSchema = new Schema(
   {
     type: {
@@ -13,8 +15,9 @@ const LocationSchema = new Schema(
       default: 'Point',
     },
     coordinates: {
-      type: [Number],
-      required: true,
+      type: [Number], // [longitude, latitude]
+      // Make optional if location isn't always known/required
+      required: false,
     },
   },
   { _id: false },
@@ -22,12 +25,7 @@ const LocationSchema = new Schema(
 
 const BusSchema = new Schema<IBusDocument>(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      unique: true,
-      auto: true,
-    },
+    // id is managed by Mongoose (_id) and transforms
     licensePlate: {
       type: String,
       required: true,
@@ -44,19 +42,23 @@ const BusSchema = new Schema<IBusDocument>(
       required: true,
       default: 120,
     },
-    currentLocation: LocationSchema,
+    currentLocation: {
+      type: LocationSchema, // Embed the location sub-schema
+      index: '2dsphere', // Geospatial index if querying by location often
+    },
     assignedRouteId: {
       type: Schema.Types.ObjectId,
       ref: 'Route',
     },
     assignedDriverId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'User', // Assumes driver is linked via User ID
     },
     busStatus: {
       type: String,
       enum: Object.values(BusStatus),
       required: true,
+      index: true,
     },
     manufactureYear: {
       type: Number,
@@ -71,6 +73,7 @@ const BusSchema = new Schema<IBusDocument>(
     toJSON: {
       transform(doc, ret) {
         ret.id = ret._id.toString();
+        // Optionally transform location coordinates if needed
         delete ret._id;
         delete ret.__v;
       },
@@ -78,6 +81,7 @@ const BusSchema = new Schema<IBusDocument>(
     toObject: {
       transform(doc, ret) {
         ret.id = ret._id.toString();
+        // Optionally transform location coordinates if needed
         delete ret._id;
         delete ret.__v;
       },

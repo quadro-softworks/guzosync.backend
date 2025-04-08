@@ -2,16 +2,11 @@ import mongoose, { Schema, Document } from 'mongoose';
 import { IAlert } from '@core/domain/models/alert.model';
 import { AlertSeverity } from '@core/domain/enums/alert-severity.enum';
 
-export interface IAlertDocument extends Document, Omit<IAlert, 'id'> {}
+// Applied the reversed Omit pattern here
+export interface IAlertDocument extends Omit<Document, 'id'>, IAlert {}
 
 const AlertSchema = new Schema<IAlertDocument>(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      unique: true,
-      auto: true,
-    },
     title: {
       type: String,
       required: true,
@@ -34,7 +29,7 @@ const AlertSchema = new Schema<IAlertDocument>(
     ],
     affectedBusStopIds: [
       {
-        type: String,
+        type: String, // Consider changing to ObjectId if BusStop IDs are ObjectIds
       },
     ],
     activeFrom: {

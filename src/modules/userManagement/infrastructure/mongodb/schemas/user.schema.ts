@@ -1,8 +1,9 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IUser, User } from '@core/domain/models/user.model';
 import { Role } from '@core/domain/enums/role.enum';
+import { AutoMap } from '@automapper/classes';
 
-export interface IUserDocument extends Document, Omit<IUser, 'id'> {}
+export interface IUserDocument extends Omit<Document, 'id'>, IUser {}
 
 const UserSchema = new Schema<IUserDocument>(
   {
@@ -37,7 +38,7 @@ const UserSchema = new Schema<IUserDocument>(
     timestamps: true,
     toJSON: {
       transform(doc, ret) {
-        ret.id = ret._id.toString();
+        ret.id = ret._id;
         delete ret.password; // Ensure password NEVER sent in JSON responses
         delete ret._id;
         delete ret.__v;
@@ -45,7 +46,7 @@ const UserSchema = new Schema<IUserDocument>(
     },
     toObject: {
       transform(doc, ret) {
-        ret.id = ret._id.toString();
+        ret.id = ret._id;
         // Don't delete password here if needed internally (e.g., for comparison)
         // but be careful where you use toObject()
         delete ret._id;
