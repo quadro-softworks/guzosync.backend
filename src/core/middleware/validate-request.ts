@@ -8,9 +8,14 @@ export const validateRequest =
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Validate the body, query, and params separately
-      if (type === 'query') await schema.parseAsync(req.query);
-      else if (type === 'params') await schema.parseAsync(req.params);
-      else if (type === 'body') await schema.parseAsync(req.body);
+      // if (type === 'query') await schema.parseAsync(req.query);
+      // else if (type === 'params') await schema.parseAsync(req.params);
+      // else if (type === 'body') await schema.parseAsync(req.body);
+      await schema.parseAsync({
+        body: req.body,
+        params: req.params,
+        query: req.query,
+      });
       return next();
     } catch (error) {
       if (error instanceof ZodError) {

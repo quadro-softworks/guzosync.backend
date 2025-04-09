@@ -1,34 +1,70 @@
 import { QueueRegulatorResult } from '@core/app/dtos/queue-regulator-result.dto';
 import { GetQueueRegulatorsQuery } from './get-queue-regulators.query';
 import { ApiError } from '@core/errors/api-error';
-import { UserModel } from '@modules/userManagement/infrastructure/mongodb/schemas/user.schema';
+import {
+  IUserDocument,
+  UserModel,
+} from '@modules/userManagement/infrastructure/mongodb/schemas/user.schema';
+import { QueueRegulatorModel } from '@modules/userManagement/infrastructure/mongodb/schemas/queue-regulator.schema'; // Import QueueRegulatorModel
 import { Err, Ok, Result } from 'neverthrow';
 import { injectable } from 'tsyringe';
 import { NotFoundError } from '@core/errors/not-found.error';
 import { PaginatedResponse } from '@core/utils/paginated-response';
-import { plainToClass } from 'class-transformer';
+import { User } from '@core/domain/models/user.model';
+import {
+  IQueueRegulator,
+  QueueRegulator,
+} from '@core/domain/models/queue-regulator.model';
+import { UserId } from '@core/domain/valueObjects';
+import { InternalServerError } from '@core/errors/internal.error';
+import { Role } from '@core/domain/enums/role.enum';
+import { UserResult } from '@core/app/dtos/user-result.dto';
 
 @injectable()
 export class GetQueueRegulatorsHandler {
   execute = async (
     query: GetQueueRegulatorsQuery,
   ): Promise<Result<PaginatedResponse<QueueRegulatorResult>, ApiError>> => {
-    const all = UserModel.find({});
+    try {
+      const queueRegulators = await QueueRegulatorModel.find()
+        .populate('userId')
+        .skip(query.skip) // Add pagination to the query
+        .limit(query.limit);
 
-    if (!all) return new Err(new NotFoundError('No queue regulators found'));
+      const totalItems = await QueueRegulatorModel.countDocuments(); // Count total queue regulators
 
-    const paginated = await all.skip(query.skip).limit(query.limit);
+      const queueRegulatorResults = queueRegulators
+        .filter((qr) => qr.userId !== null)
+        .map((qr) => {
+          // Ensure qr.userId is populated before accessing its properties
+          const user = qr.userId as unknown as IUserDocument; // Type assertion after populate
 
-    const allLength = await all.countDocuments();
+          const res = new QueueRegulatorResult(
+            {
+              ...new User(user.toObject()),
+            },
+            {
+              ...new QueueRegulator(qr.toObject()),
+            },
+          );
+          console.log('QR Result ,', res);
+          return res;
+        });
 
-    return new Ok({
-      items: paginated.map((user) => plainToClass(QueueRegulatorResult, user)),
-      pagination: {
-        currentPage: query.page,
-        totalPages: Math.ceil(allLength / query.limit),
-        totalItems: allLength,
-        limit: query.limit,
-      },
-    } as PaginatedResponse<QueueRegulatorResult>);
+      return new Ok({
+        items: queueRegulatorResults,
+        pagination: {
+          currentPage: query.page,
+          totalPages: Math.ceil(totalItems / query.limit),
+          totalItems: totalItems,
+          limit: query.limit,
+        },
+      });
+    } catch (error) {
+      console.error('Error fetching queue regulators:', error);
+      return new Err(
+        new InternalServerError('Failed to fetch queue regulators'),
+      );
+    }
   };
 }

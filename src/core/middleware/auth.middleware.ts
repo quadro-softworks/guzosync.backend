@@ -48,6 +48,7 @@ export const requireAuth = (
 
     // 4. Attach payload to request object
     req.user = payload;
+    console.log(req.user); // Debugging line to check the payload
 
     // 5. Call next middleware/handler
     next();
