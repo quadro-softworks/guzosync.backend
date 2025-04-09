@@ -3,7 +3,6 @@ import {
   MAX_PAGE_LIMIT,
   MIN_PAGE_LIMIT,
 } from '@core/constants/pagination.constants';
-import { skip } from 'node:test';
 import { z } from 'zod';
 
 export class PaginationParams {
@@ -34,3 +33,5 @@ export const PaginationParamsSchema = z
     limit,
     skip: (page - 1) * limit,
   }));
+
+export const DefaultPaginationParams = new PaginationParams();

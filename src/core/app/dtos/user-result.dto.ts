@@ -19,7 +19,7 @@ export class UserResult implements IUserResult {
   createdAt: Date;
   updatedAt: Date;
 
-  constructor(user: UserResult) {
+  constructor(user: IUserResult) {
     this.id = user.id;
     this.firstName = user.firstName;
     this.lastName = user.lastName;
