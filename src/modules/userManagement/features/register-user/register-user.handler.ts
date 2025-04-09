@@ -1,6 +1,9 @@
 // src/modules/user-management/features/register-user/register-user.handler.ts
 import { injectable, inject } from 'tsyringe';
-import { UserModel } from '@modules/userManagement/infrastructure/mongodb/schemas/user.schema'; // Adjust the import path as necessary
+import {
+  IUserDocument,
+  UserModel,
+} from '@modules/userManagement/infrastructure/mongodb/schemas/user.schema'; // Adjust the import path as necessary
 
 import { RegisterUserCommand } from './register-user.command';
 import { IHashingService } from '@core/services/hashing.service';
@@ -32,8 +35,9 @@ export class RegisterUserHandler {
     const newUser = new UserModel({
       email: command.email,
       password: hashedPassword,
-      name: command.name,
-      // roles: ['user'] // Handled by schema default
+      firstName: command.firstName,
+      lastName: command.lastName,
+      role: command.role,
     });
 
     // 4. Save to DB
