@@ -30,8 +30,13 @@ import {
   ITrackingServiceMeta,
   TrackingService,
 } from '@modules/busRouteManagement/services/tracking.service';
+import { connectDB } from '@core/database/mongo';
 
-export default function registerServices(appContainer: DependencyContainer) {
+export default async function registerServices(
+  appContainer: DependencyContainer,
+) {
+  await connectDB();
+
   console.log('Registering dependencies...'); // Add log for debugging
 
   appContainer.registerSingleton(IEventBusMeta.name, AppEventBus);
