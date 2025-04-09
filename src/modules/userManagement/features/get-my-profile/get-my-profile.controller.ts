@@ -19,13 +19,16 @@ export class GetMyProfileController {
         // This check is belt-and-suspenders; middleware should handle it
         throw new UnauthorizedError('Authentication required.');
       }
-      const userId = req.user.userId;
-      const userProfile = await this.handler.execute(userId);
-      ResponseHandler.sendSuccess(
-        res,
-        userProfile,
-        'Profile fetched successfully.',
-      );
+
+      const userProfile = await this.handler.execute(req.user.userId);
+      if (userProfile.isErr())
+        ResponseHandler.sendApiError(res, userProfile.error);
+      else
+        ResponseHandler.sendSuccess(
+          res,
+          userProfile.value,
+          'Profile fetched successfully.',
+        );
     } catch (error) {
       next(error); // Catches NotFoundError etc.
     }
