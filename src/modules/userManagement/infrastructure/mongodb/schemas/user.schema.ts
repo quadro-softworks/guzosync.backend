@@ -7,12 +7,6 @@ export interface IUserDocument extends Omit<Document, 'id'>, IUser {}
 
 const UserSchema = new Schema<IUserDocument>(
   {
-    id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      unique: true,
-      auto: true, // Auto-generate ObjectId if not provided
-    },
     email: {
       type: String,
       required: true,
