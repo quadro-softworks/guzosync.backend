@@ -1,3 +1,4 @@
+import { DefaultPaginationParams } from './../../core/app/dtos/pagination-params.dto';
 import { ResponseHandler } from './../../core/utils/api-response';
 import { injectable } from 'tsyringe';
 import { Request, Response, NextFunction } from 'express';
@@ -7,6 +8,9 @@ import { RegisterBusHandler } from './features/register-bus/register-bus.handler
 
 // Add other handlers
 import { RegisterPersonnelHandler } from './features/personnel/register-personnel/register-personnel.handler';
+import { GetQueueRegulatorsHandler } from '@modules/operationsControl/features/personnel/get-queue-regulators/get-queue-regulators.handler';
+import { GetQueueRegulatorsQuery } from '@modules/operationsControl/features/personnel/get-queue-regulators/get-queue-regulators.query';
+import { DefaultFilterParams } from '@core/app/dtos/filter-params.dto';
 // import { GetQueueRegulatorsHandler } from './features/personnel/get-queue-regulators/get-queue-regulators.handler';
 // import { GetQueueRegulatorByIdHandler } from './features/personnel/get-queue-regulator-by-id/get-queue-regulator-by-id.handler';
 // import { UpdateQueueRegulatorHandler } from './features/personnel/update-queue-regulator/update-queue-regulator.handler';
@@ -25,9 +29,9 @@ export class ControlCenterController {
   private registerPersonnelHandler = appContainer.resolve(
     RegisterPersonnelHandler,
   );
-  // private getQueueRegulatorsHandler = appContainer.resolve(
-  //   GetQueueRegulatorsHandler,
-  // );
+  private getQueueRegulatorsHandler = appContainer.resolve(
+    GetQueueRegulatorsHandler,
+  );
   // private getQueueRegulatorByIdHandler = appContainer.resolve(
   //   GetQueueRegulatorByIdHandler,
   // );
@@ -87,19 +91,34 @@ export class ControlCenterController {
     }
   };
 
-  // public getQueueRegulators = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction,
-  // ): Promise<void> => {
-  //   try {
-  //     const filters = req.query;
-  //     const result = await this.getQueueRegulatorsHandler.execute(filters);
-  //     ResponseHandler.sendSuccess(res, result, 'Queue regulators fetched successfully.');
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
+  public getQueueRegulators = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const filters: GetQueueRegulatorsQuery = {
+        ...req.query,
+        ...DefaultPaginationParams,
+        ...DefaultFilterParams,
+      };
+      const result = await this.getQueueRegulatorsHandler.execute(filters);
+      if (result.isErr()) {
+        ResponseHandler.sendApiError(
+          res,
+          result.error,
+          result.error.statusCode,
+        );
+      } else
+        ResponseHandler.sendSuccess(
+          res,
+          result.value,
+          'Queue regulators fetched successfully.',
+        );
+    } catch (error) {
+      next(error);
+    }
+  };
 
   // public getQueueRegulatorById = async (
   //   req: Request,

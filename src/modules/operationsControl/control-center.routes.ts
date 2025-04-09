@@ -23,8 +23,8 @@ const controlCenterRoutes = (router: Router) => {
     ccc.registerPersonnel,
   );
 
-  // // ✅ QUEUE REGULATORS
-  // router.get('/personnel/queue-regulators', ccc.getQueueRegulators); // Add filter/pagination middleware if needed
+  // ✅ QUEUE REGULATORS
+  router.get('/personnel/queue-regulators', ccc.getQueueRegulators); // Add filter/pagination middleware if needed
 
   // router.get('/personnel/queue-regulators/:regulatorId', ccc.getQueueRegulatorById);
 
