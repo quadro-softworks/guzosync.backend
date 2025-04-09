@@ -24,11 +24,11 @@ export class ResponseHandler {
   static sendApiError(
     res: Response,
     error: ApiError,
-    statusCode: number = 500,
+    statusCode?: number,
     errors?: any[],
   ): void {
     res
-      .status(error.statusCode || statusCode)
+      .status(error.statusCode || statusCode || 500)
       .json(new ApiResponse<null>(false, error.message, null, errors));
   }
 
