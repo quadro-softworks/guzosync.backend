@@ -1,3 +1,4 @@
+import { AutoMap } from '@automapper/classes';
 import { BusStopId, QueueRegulatorId, UserId } from '@core/domain/valueObjects';
 
 export interface IQueueRegulator {
