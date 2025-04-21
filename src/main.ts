@@ -11,8 +11,8 @@ import registerServices from '@core/di/registerServices';
 import { busRoutes } from '@modules/busRouteManagement/bus.routes';
 import { routesRoutes } from '@modules/busRouteManagement/routes.routes';
 import { controlCenterRoutes } from '@modules/operationsControl/control-center.routes';
-import { mapper } from '@core/mapping/mapper';
-import { registerMapping } from '@core/mapping/registerMapping';
+import swaggerui from 'swagger-ui-express';
+import { swaggerSpec } from '@core/config/swaggerConfig';
 
 type HttpServer = http.Server<
   typeof http.IncomingMessage,
@@ -20,16 +20,11 @@ type HttpServer = http.Server<
 >;
 
 const initializeApp = async (): Promise<[Express, HttpServer]> => {
-  registerServices(appContainer);
-
-  // --- Database Connection ---
-  await connectDB();
+  await registerServices(appContainer);
 
   // --- Express App Setup ---
   const app: Express = express();
   const httpServer = http.createServer(app); // Create HTTP server with Express app
-
-  registerMapping(); // Register mapping profiles for different dtos
 
   registerMiddlewares(app);
 
@@ -44,6 +39,7 @@ const initializeApp = async (): Promise<[Express, HttpServer]> => {
 const registerMiddlewares = (app: Express) => {
   app.use(express.json()); // Middleware to parse JSON bodies
   app.use(express.urlencoded({ extended: true })); // Middleware for URL-encoded bodies
+  app.use('/swagger', swaggerui.serve, swaggerui.setup(swaggerSpec));
 };
 
 const registerRoutes = (app: Express) => {
