@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prepare": "ts-patch install -s",
     "build": "tsc && tsc-alias",
     "start": "node -r tsconfig-paths/register dist/main.js",
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/main.ts",
