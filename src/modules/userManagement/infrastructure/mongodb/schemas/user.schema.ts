@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IUser, User } from '@core/domain/models/user.model';
 import { Role } from '@core/domain/enums/role.enum';
-import { AutoMap } from '@automapper/classes';
 
 export interface IUserDocument extends Omit<Document, 'id'>, IUser {}
 

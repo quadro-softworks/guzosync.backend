@@ -14,8 +14,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@automapper/classes": "^8.8.1",
-    "@automapper/core": "^8.8.1",
     "@types/express": "^5.0.1",
     "@types/node": "^22.13.17",
     "@types/swagger-jsdoc": "^6.0.4",

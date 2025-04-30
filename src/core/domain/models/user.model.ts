@@ -1,4 +1,3 @@
-import { AutoMap } from '@automapper/classes';
 import { Role } from '@core/domain/enums/role.enum';
 import { BusId, BusStopId, UserId } from '@core/domain/valueObjects';
 
