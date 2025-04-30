@@ -1,5 +1,5 @@
 // src/core/services/hashing.service.ts
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { injectable } from 'tsyringe';
 import config from '@core/config';
 
