@@ -20,7 +20,7 @@ export class RegisterUserController {
         res,
         createdUser,
         'User registered successfully',
-        201,
+        201,  
       );
     } catch (error) {
       next(error);

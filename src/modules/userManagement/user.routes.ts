@@ -26,37 +26,90 @@ export const userRoutes = (router: Router) => {
   const confirmPasswordResetController = new ConfirmPasswordResetController();
   const getMyProfileController = new GetMyProfileController();
 
-  // Define routes
+  /**
+   * @swagger
+   * /register:
+   *  post:
+   *    description: Register a new user (Passenger / CC Admin)
+   *    responses:
+   *      201:
+   *        description: User registered successfully
+   */
   router.post(
     '/register',
     validateRequest(RegisterUserSchema),
     registerUserController.register,
   );
 
+  /**
+   * @swagger
+   * /login:
+   *  post:
+   *    description: Log in a user
+   *    responses:
+   *      200:
+   *        description: User logged in successfully
+   */
   router.post(
     '/login',
     validateRequest(LoginUserSchema),
     loginUserController.login,
   );
 
+  /**
+   * @swagger
+   * /logout:
+   *  post:
+   *    description: Log out a user
+   *    responses:
+   *      200:
+   *        description: User logged out successfully
+   */
   router.post(
     '/logout',
     requireAuth, // Requires authentication
     logoutUserController.logout,
   );
 
+  /**
+   * @swagger
+   * /password/reset/request:
+   *  post:
+   *    description: Request a password reset
+   *    responses:
+   *      200:
+   *        description: Password reset request submitted successfully
+   */
   router.post(
     '/password/reset/request',
     validateRequest(RequestPasswordResetSchema),
     requestPasswordResetController.requestReset,
   );
 
+  /**
+   * @swagger
+   * /password/reset/confirm:
+   *  post:
+   *    description: Confirm password reset with token
+   *    responses:
+   *      200:
+   *        description: Password reset successfully
+   */
   router.post(
     '/password/reset/confirm',
     validateRequest(ConfirmPasswordResetSchema),
     confirmPasswordResetController.confirmReset,
   );
 
+  /**
+   * @swagger
+   * /me:
+   *  get:
+   *    description: Get the profile of the currently authenticated user
+   *    responses:
+   *      200:
+   *        description: Profile retrieved successfully
+   */
   router.get(
     '/me',
     requireAuth, // Requires authentication

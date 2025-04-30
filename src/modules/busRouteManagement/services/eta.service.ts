@@ -48,7 +48,7 @@ export class SimpleETAService implements IETAService {
       const stopId =
         typeof stopRef === 'object' && '_id' in stopRef
           ? (stopRef as any)._id.toString()
-          : stopRef?.toString();
+          : stopRef;
       if (stopId) {
         etas.push({ stopId: stopId, etaMinutes: dummyMinutes });
         dummyMinutes += 5; // Increment dummy ETA

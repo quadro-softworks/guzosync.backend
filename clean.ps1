@@ -1,0 +1,1 @@
+Remove-Item -Path node_modules, package-lock.json, yarn.lock, pnpm-lock.yaml, dist -Force -Recurse -ErrorAction SilentlyContinue
