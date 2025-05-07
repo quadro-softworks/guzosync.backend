@@ -4,6 +4,7 @@ import { TrackingGateway } from '@modules/busRouteManagement/tracking.gateway';
 import { Server as HttpServer } from 'http'; // Import HTTP server type
 import { Server as SocketIoServer, Socket } from 'socket.io';
 import { container } from 'tsyringe'; // Import DI container
+import { BusLocationUpdateListener } from '@modules/busRouteManagement/listeners/bus-location-update-listener';
 
 let io: SocketIoServer;
 
@@ -25,6 +26,10 @@ export function initSocketServer(httpServer: HttpServer): SocketIoServer {
   // The gateway needs the 'io' instance implicitly or explicitly
   const trackingGateway = container.resolve(TrackingGateway);
   trackingGateway.init(io); // Pass the io instance to the gateway
+
+  // Initialize the bus location update listener
+  const busLocationUpdateListener = container.resolve(BusLocationUpdateListener);
+  busLocationUpdateListener.initialize(io);
 
   // --- Basic Connection Logging (Optional) ---
   io.on('connection', (socket: Socket) => {

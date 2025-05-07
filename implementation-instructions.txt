@@ -1,0 +1,215 @@
+Guzo Sync Backend
+Vertical Slice Architecture (Groupings by feature)
+Modular Monolith
+InMemory Event Bus (Module interaction medium)
+WebSocket Communication
+
+Request-Response Workflow
+Client → Request
+ The client sends a request to the server via an HTTP call.
+
+
+Request → Data Transfer Object (DTO)
+ The request data is deserialized into a Request Object (DTO) for validation and transfer.
+
+
+DTO → ApiController
+ The ApiController receives the validated DTO and orchestrates the operation.
+
+
+ApiController → Command/Query
+ Depending on the operation, the ApiController transforms the request into a Command (for write operations) or a Query (for read operations).
+
+
+Command/Query → Feature Handlers
+ The Command/Query is routed to the corresponding Feature Handler, which encapsulates the logic for the requested operation.
+
+
+Feature Handlers → Model (Database)
+ The Feature Handler interacts with the Model layer to retrieve or persist data.
+
+
+Feature Handlers ← Query Result / No Result
+ The Feature Handler processes the database response, returning a Query Result (if applicable) or a status (e.g., success or failure).
+
+
+ApiController ← Result Object
+ The ApiController packages the result into a Response Object, ensuring adherence to the expected API contract.
+
+
+Client ← Response
+ The client receives the response, completing the interaction.
+
+Module Classification:
+busRouteManagement
+Notifications
+operationsControl
+passengerService
+userManagement
+
+General Backend Functionalities (Likely shared across modules):
+Authentication & Authorization:
+Functionality: User registration, login, logout, password management (reset, forgot).
+API Endpoints:
+POST /api/accounts/register (User registration - Passenger,Control Center)
+POST /api/accounts/login (User login)
+POST /api/accounts/logout (User logout)
+POST /api/accounts/password/reset/request (Request password reset - email based)
+POST /api/accounts/password/reset/confirm (Confirm password reset with token)
+GET /api/account/me (Get current user's profile - authenticated)
+User Profile Management:
+Functionality: View and update user profile information.
+API Endpoints: 
+GET /api/account/me (Get logged-in user's profile)
+PUT /api/account/me (Update logged-in user's profile)
+Notifications:
+Functionality: Send and receive notifications (real-time, push notifications).
+API Endpoints
+GET /api/notifications (Get logged-in user's notifications - paginated, potentially with filtering)
+POST /api/notifications/mark-read/{notificationId} (Mark a notification as read)
+PUT /api/account/notification-settings (Update logged-in user's notification preferences)
+POST /api/notifications/broadcast (Send a broadcast notification - Admin/Control Center only) - For Control Center to notify all users, drivers, regulators etc.
+Language Management:
+Functionality: Switch language for the application interface and content.
+API Endpoints:
+PUT /api/account/language (Update logged-in user's preferred language)
+GET /api/config/languages (Get a list of supported languages)
+Module Specific Functionalities & API Endpoints:
+1. Passenger Module:
+Real-Time Bus Tracking: 
+Functionality: Track bus locations on a map, view bus details (route, ETA). Based on the route specified by the passengers
+
+
+Socket Events:
+tracking.bus_updates (Get a list of all buses with their current location, ETA - potentially filtered by route, bus stop) - The server emits this event, the client listens
+tracking.bus_updates.request (The client sends the route data to the srv on this channel, the server responds with ‘tracking.bus.updates’ event) 
+API Endpoints:
+GET /api/buses/{busId} (Get details of a specific bus including route, capacity, status, current location, ETA for next stops) 
+GET /api/routes/{routeId} (Get details of a specific route including bus stops, path)
+GET /api/buses/stops (Get a list of all bus stops - potentially with search/filter by name, location) 
+Personalized Alerts:
+Functionality: Set alerts for specific buses or routes, receive notifications for delays, route changes.
+API Endpoints:
+GET /api/alerts (Get logged-in passenger's active alerts)
+POST /api/alerts (Create a new alert - for a bus or route, with alert type - delay, ETA change etc.)
+PUT /api/alerts/{alertId} (Update an existing alert)
+DELETE /api/alerts/{alertId} (Delete an alert)
+Feedback:
+Functionality: Provide feedback on bus experience.
+API Endpoints:
+POST /api/trip/feedback (Submit feedback - includes trip details, rating, comments)
+GET /api/trip/feedback (Get logged-in passenger's submitted feedback - for history, optional)
+Search for Bus Fermatas (Bus Stops):
+Functionality: Search for bus stops by name or location.
+API Endpoints:
+GET /api/buses/stops?search={searchTerm}&filterBy={filterTerm}&pn=1&ps=10 (Search bus stops - uses query parameter for search term, and ‘name’ or ‘location’ for filterBy, pn(pageNumber), ps(pageSize))
+2. Queue Regulator Module:
+Request Route Reallocation (RDN Switch):
+Functionality: Request bus reallocation or RDN switch.
+API Endpoints:
+POST /api/buses/reallocate (Submit a reallocation request - includes bus stop, estimated passengers, reason)
+GET /api/buses/reallocation/requests (Get list of reallocation requests submitted by the regulator - history)
+Report Issues:
+Functionality: Report issues at the bus stop (overcrowding, delays, incidents).
+API Endpoints:
+POST /api/issues/report (Report an issue - includes bus stop, issue type, description)
+GET /api/issues (Get list of issues reported by the regulator - history)
+Communicate with Control Center:
+Functionality: Contact control center for assistance.
+Socket Events
+‘conversation.message_sent’(params: { data, senderId, receiverId}) The client will send using this event
+‘conversation.message_received’ (params: {data, senderId, receiverId})
+API Endpoints: 
+GET /api/conversations/{conversationId}/messages (Get messages within a conversation)
+GET /api/conversations (Get all conversations)
+3. Bus Driver Module:
+Receive Traffic Information:
+Functionality: View real-time traffic information along the route.
+Socket Events:
+tracking.traffic_info (Get traffic information for the driver's current route - likely needs route ID or current location as parameter)
+Access Route Schedules:
+Functionality: View assigned route schedules.
+API Endpoints:
+GET /api/drivers/schedules (Get driver's assigned schedules - likely based on driver ID or assigned bus)
+GET /api/drivers/routes/{routeId}/schedule (Get schedule for a specific route)
+Acknowledge Control Center Instructions:
+Functionality: Acknowledge instructions received from the control center.
+API Endpoints:
+GET /api/drivers/instructions (Get list of instructions received by the driver - pending/acknowledged status)
+PUT /api/drivers/instructions/{instructionId}/acknowledge (Acknowledge an instruction)
+4. Control Center Module:
+Personnel Management (Queue Regulators & Bus Drivers):
+Functionality: Register, list, remove queue regulators and bus drivers, assign regulators to fermatas, assign buses to fermatas.
+API Endpoints:
+POST /api/control-center/personnel/register (Register a new queue regulator or bus driver)
+GET /api/control-center/personnel/queue-regulators (List all queue regulators - with filters, pagination)
+GET /api/control-center/personnel/queue-regulators/{regulatorId} (Get details of a specific queue regulator)
+PUT /api/control-center/personnel/queue-regulators/{regulatorId} (Update queue regulator details)
+DELETE /api/control-center/personnel/queue-regulators/{regulatorId}  (Remove a queue regulator)
+PUT /api/control-center/personnel/queue-regulators/{regulatorId}/assign/bus-stop/{busStopId} (Assign a queue regulator to a bus stop)
+GET /api/control-center/personnel/bus-drivers (List all bus drivers - with filters, pagination)
+GET /api/control-center/personnel/bus-drivers/{driverId} (Get details of a specific bus driver)
+PUT /api/control-center/personnel/bus-drivers/{driverId} (Update bus driver details)
+DELETE /api/control-center/personnel/bus-drivers/{driverId} (Remove a bus driver)
+PUT /api/control-center/personnel/bus-drivers/{driverId}/assign-bus/{busId} (Assign a bus driver to a bus)
+Fermata (Bus Stop) Management:
+Functionality: Create, list, update fermatas.
+API Endpoints:
+POST /api/control-center/bus-stops (Create a new bus stop)
+GET /api/control-center/bus-stops (List all bus stops - with filters, pagination)
+GET /api/control-center/bus-stops/{busStopId} (Get details of a specific bus stop)
+PUT /api/control-center/bus-stops/{busStopId} (Update bus stop details)
+DELETE /api/control-center/bus-stops/{busStopId} (Remove a bus stop)
+Bus Management:
+Functionality: Assign buses to fermatas, track buses, reallocate buses, deploy stationary buses.
+API Endpoints:
+GET /api/control-center/buses (List all buses - with filters, pagination, status)
+GET /api/control-center/buses/{busId} (Get details of a specific bus)
+PUT /api/control-center/buses/{busId} (Update bus details - status, capacity etc.)
+PUT /api/control-center/buses/{busId}/assign-route/{routeId} (Assign a bus to a route)
+PUT /api/control-center/buses/{busId}/reallocate-route/{routeId} (Reallocate a bus to a different route)
+POST /api/control-center/buses/deploy-stationary (Deploy stationary buses - likely needs parameters for location, route if deploying on a route)
+Route Management:
+Functionality: Create, list, update routes.
+API Endpoints:
+POST /api/control-center/routes (Create a new route)
+GET /api/control-center/routes (List all routes - with filters, pagination)
+GET /api/control-center/routes/{routeId} (Get details of a specific route)
+PUT /api/control-center/routes/{routeId} (Update route details - stops, path)
+DELETE /api/control-center/routes/{routeId} (Remove a route)
+Reallocation Request Management:
+Functionality: Receive and respond to reallocation requests from queue regulators.
+API Endpoints:
+GET /api/control-center/reallocation-requests (List all reallocation requests - with filters like status (pending, approved, denied))
+GET /api/control-center/reallocation-requests/{requestId} (Get details of a specific reallocation request)
+PUT /api/control-center/reallocation-requests/{requestId}/approve (Approve a reallocation request)
+PUT /api/control-center/reallocation-requests/{requestId}/deny (Deny a reallocation request)
+Incident Management:
+Functionality: View and manage incidents reported by drivers and regulators.
+API Endpoints:
+GET /api/control-center/incidents (List all incidents - with filters like status (open, resolved), type, reporter)
+GET /api/control-center/incidents/{incidentId} (Get details of a specific incident)
+PUT /api/control-center/incidents/{incidentId}/resolve (Mark an incident as resolved)
+Reporting and Analytics:
+Functionality: Generate performance and usage reports (passenger counts, delays, schedule adherence).
+API Endpoints:
+GET /api/control-center/reports/bus-performance (Get bus performance report - with date range, filters)
+GET /api/control-center/reports/route-performance (Get route performance report - with date range, filters)
+GET /api/control-center/reports/passenger-usage (Get passenger usage report - with date range, filters)
+More specific report endpoints can be added as needed based on required metrics.
+5. Tracker Management Module (Likely internal services, not direct API endpoints for external actors):
+Real-time data processing from GPS:
+Functionality: Process GPS data from buses and drivers, calculate ETAs, manage map data.
+API Endpoints: (Likely internal services used by other modules, not directly exposed as REST endpoints)
+Example internal service (not REST endpoint): POST /internal/tracker/update-bus-location (used by Bus Driver Module to send location updates)
+Example internal service: GET /internal/tracker/calculate-eta (used by Passenger and Regulator Modules to get ETAs)
+Important Considerations for Backend Implementation:
+Data Validation: Implement robust data validation on all API endpoints to ensure data integrity. (zod)
+Error Handling: Implement proper error handling and return meaningful error responses to the client.
+Security: Secure all API endpoints using appropriate authentication and authorization mechanisms (e.g., JWT, OAuth 2.0). Protect sensitive data with encryption.
+Real-time Updates: Consider using WebSockets or Server-Sent Events (SSE) for real-time updates like bus locations, ETAs, and notifications.
+Scalability: Design the backend to be scalable to handle a large number of users, buses, and requests. Consider using load balancing, caching, and efficient database queries.
+Database: Choose a suitable database based on the project requirements (MongoDB as mentioned in the document is a good choice for flexible schema and geospatial data).
+API Documentation: Document all API endpoints clearly (e.g., using Swagger/OpenAPI).
+This list provides a comprehensive starting point for building the backend for your Public Bus Tracking System. You might need to adjust and refine these endpoints as you proceed with the implementation and get more specific requirements. Remember to prioritize security, scalability, and user experience throughout the development process. Good luck!
+

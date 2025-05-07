@@ -13,6 +13,7 @@ import { routesRoutes } from '@modules/busRouteManagement/routes.routes';
 import { controlCenterRoutes } from '@modules/operationsControl/control-center.routes';
 import swaggerui from 'swagger-ui-express';
 import { swaggerSpec } from '@core/config/swaggerConfig';
+import { passengerRoutes } from '@modules/passengerService/passenger.routes';
 
 type HttpServer = http.Server<
   typeof http.IncomingMessage,
@@ -54,6 +55,10 @@ const registerRoutes = (app: Express) => {
   app.use(
     `${config.api.basePath}/control-center`,
     controlCenterRoutes(app.router),
+  );
+  app.use(
+    `${config.api.basePath}/passenger`,
+    passengerRoutes(app.router),
   );
 };
 
