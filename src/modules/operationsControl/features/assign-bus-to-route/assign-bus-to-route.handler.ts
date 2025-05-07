@@ -3,7 +3,7 @@ import { BusModel } from '@modules/busRouteManagement/infrastructure/mongodb/sch
 import { RouteModel } from '@modules/busRouteManagement/infrastructure/mongodb/schemas/route.schema';
 import { AssignBusToRouteCommand } from './assign-bus-to-route.command';
 import { NotFoundError } from '@core/errors/not-found.error';
-import { IEventBus } from '@core/events/event-bus';
+import { IEventBus } from '@core/events/event-bus.interface';
 import { BusUpdatedEvent } from '@modules/busRouteManagement/constants/events';
 
 @injectable()

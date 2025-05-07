@@ -3,7 +3,7 @@ import { BusStopModel } from '@modules/busRouteManagement/infrastructure/mongodb
 import { UpdateBusStopCommand } from './update-bus-stop.command';
 import { NotFoundError } from '@core/errors/not-found.error';
 import { ConflictError } from '@core/errors/conflict.error';
-import { IEventBus } from '@core/events/event-bus';
+import { IEventBus } from '@core/events/event-bus.interface';
 import { BusStopUpdatedEvent } from '@modules/busRouteManagement/constants/events';
 
 @injectable()

@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { IEventBus } from '@core/events/event-bus';
+import { IEventBus } from '@core/events/event-bus.interface';
 import { BusLocationUpdatedEvent } from '@modules/busRouteManagement/constants/events';
 import { Server as SocketIoServer } from 'socket.io';
 import TrackingEvents from '@modules/busRouteManagement/constants/tracking.constants';
@@ -24,7 +24,7 @@ export class BusLocationUpdateListener {
 
   private setupEventHandlers(): void {
     // Subscribe to bus location update events
-    this.eventBus.subscribe(BusLocationUpdatedEvent, (event) => {
+    this.eventBus.subscribe(BusLocationUpdatedEvent, (event: { payload: BusLocationUpdateResult; }) => {
       this.handleBusLocationUpdate(event.payload as BusLocationUpdateResult);
     });
   }

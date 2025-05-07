@@ -3,10 +3,6 @@ import EventEmitter from 'eventemitter3';
 import { injectable, singleton } from 'tsyringe';
 import { IEvent, IEventBus } from './event-bus.interface';
 
-
-
-
-
 export const IEventBusMeta = {
   name: 'IEventBus',
 };

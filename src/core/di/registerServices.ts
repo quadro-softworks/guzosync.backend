@@ -3,7 +3,7 @@ import {
   NodemailerEmailService,
 } from '@core/services/email.service';
 import { RegisterUserHandler } from './../../modules/userManagement/features/register-user/register-user.handler';
-import { IEventBus, IEventBusMeta, AppEventBus } from '@core/events/event-bus';
+import { IEventBusMeta, AppEventBus } from '@core/events/event-bus';
 import {
   IHashingService,
   IHashingServiceMeta,

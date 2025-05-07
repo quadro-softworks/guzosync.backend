@@ -2,7 +2,7 @@ import { injectable, inject } from 'tsyringe';
 import { BusModel } from '@modules/busRouteManagement/infrastructure/mongodb/schemas/bus.schema';
 import { UpdateBusLocationCommand } from './update-bus-location.command';
 import { NotFoundError } from '@core/errors/not-found.error';
-import { IEventBus } from '@core/events/event-bus';
+import { IEventBus } from '@core/events/event-bus.interface';
 import { BusLocationUpdatedEvent } from '@modules/busRouteManagement/constants/events';
 import { BusLocationUpdateResult } from '@core/app/dtos/bus-location-update-result.dto';
 import { plainToClass } from 'class-transformer';

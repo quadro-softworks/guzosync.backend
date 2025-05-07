@@ -4,7 +4,7 @@ import { BusStopModel } from '@modules/busRouteManagement/infrastructure/mongodb
 import { CreateRouteCommand } from './create-route.command';
 import { ConflictError } from '@core/errors/conflict.error';
 import { NotFoundError } from '@core/errors/not-found.error';
-import { IEventBus } from '@core/events/event-bus';
+import { IEventBus } from '@core/events/event-bus.interface';
 import { RouteCreatedEvent } from '@modules/busRouteManagement/constants/events';
 
 @injectable()

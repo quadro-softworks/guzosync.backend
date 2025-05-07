@@ -10,7 +10,7 @@ import { IHashingService } from '@core/services/hashing.service';
 import { BadRequestError } from '@core/errors/bad-request.error';
 import { AuthResult } from '@core/app/dtos/auth-result.dto';
 // Optional: Import event bus if publishing an event
-// import { IEventBus } from '@core/events/event-bus';
+// import { IEventBus } from '@core/events/event-bus.interface';
 
 @injectable()
 export class RegisterUserHandler {

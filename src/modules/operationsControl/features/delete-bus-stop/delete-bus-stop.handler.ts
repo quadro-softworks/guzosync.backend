@@ -2,7 +2,7 @@ import { injectable, inject } from 'tsyringe';
 import { BusStopModel } from '@modules/busRouteManagement/infrastructure/mongodb/schemas/bus-stop.schema';
 import { DeleteBusStopCommand } from './delete-bus-stop.command';
 import { NotFoundError } from '@core/errors/not-found.error';
-import { IEventBus } from '@core/events/event-bus';
+import { IEventBus } from '@core/events/event-bus.interface';
 import { BusStopDeletedEvent } from '@modules/busRouteManagement/constants/events';
 
 @injectable()
