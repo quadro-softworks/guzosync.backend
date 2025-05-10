@@ -6,6 +6,7 @@ import { IEventBus } from '@core/events/event-bus.interface';
 import { BusLocationUpdatedEvent } from '@modules/busRouteManagement/constants/events';
 import { BusLocationUpdateResult } from '@core/app/dtos/bus-location-update-result.dto';
 import { plainToClass } from 'class-transformer';
+import { Location } from '@core/domain/valueObjects/location.vo';
 
 @injectable()
 export class UpdateBusLocationHandler {
@@ -22,11 +23,23 @@ export class UpdateBusLocationHandler {
       throw new NotFoundError(`Bus with ID ${busId} not found`);
     }
     
+    // Create a properly formatted location for MongoDB geospatial storage
+    const geoLocation = {
+      type: 'Point',
+      coordinates: location.coordinates
+    };
+    
+    // Transform the coordinates to match the Location vo format for domain usage
+    const domainLocation: Location = {
+      longitude: location.coordinates[0],
+      latitude: location.coordinates[1]
+    };
+    
     // Update bus location
     const updatedBus = await BusModel.findByIdAndUpdate(
       busId,
       { 
-        currentLocation: location,
+        currentLocation: geoLocation,
         lastLocationUpdate: new Date()
       },
       { new: true }
@@ -39,7 +52,7 @@ export class UpdateBusLocationHandler {
     // Create a properly typed result object
     const result = plainToClass(BusLocationUpdateResult, {
       busId: updatedBus._id?.toString() || busId,
-      location: updatedBus.currentLocation,
+      location: domainLocation,
       routeId: updatedBus.assignedRouteId ? updatedBus.assignedRouteId.toString() : null,
       status: updatedBus.busStatus,
       etas: [] // We're not calculating ETAs here, that's done by the tracking service

@@ -1,6 +1,8 @@
 import { Location } from '@core/domain/valueObjects/location.vo';
 import { RouteModel } from '@modules/busRouteManagement/infrastructure/mongodb/schemas/route.schema';
+import { StopModel } from '@modules/busRouteManagement/infrastructure/mongodb/schemas/stop.schema';
 import { injectable, inject } from 'tsyringe';
+import { IMapService, IMapServiceMeta } from './map.service';
 
 export interface IETAService {
   // Calculate ETAs for upcoming stops on a route given current bus location
@@ -19,39 +21,86 @@ export interface IETAService {
 export const IETAServiceMeta = { name: 'IETAService' };
 
 @injectable()
-export class SimpleETAService implements IETAService {
-  // TODO: Inject Route/Stop services if needed instead of direct models
-  constructor() {}
+export class ETAService implements IETAService {
+  constructor(
+    @inject(IMapServiceMeta.name) private mapService: IMapService
+  ) {}
 
-  // VERY Basic Placeholder - Real implementation needs geometry, avg speeds etc.
   async calculateRouteETAs(
     routeId: string,
     currentBusLocation: Location,
   ): Promise<{ stopId: string; etaMinutes: number | null }[]> {
-    console.warn(
-      `[ETAService] Calculating basic ETAs for route ${routeId}. Needs proper implementation.`,
-    );
-    const route = await RouteModel.findById(routeId).populate('stopIds'); // Populate is inefficient, better fetch stops separately if needed
+    const route = await RouteModel.findById(routeId);
     if (!route || !Array.isArray(route.stopIds) || route.stopIds.length === 0) {
       return [];
     }
 
-    // Placeholder: Find rough position and estimate based on fixed speed
-    // In reality: determine which stop is next, calculate distance along route polyline, use avg speed/traffic
-    const averageSpeedKmph = 30; // km/h - placeholder
-    const etas: { stopId: string; etaMinutes: number | null }[] = [];
+    // Get all stops for this route
+    const stops = await StopModel.find({
+      _id: { $in: route.stopIds }
+    });
 
-    // This is NOT accurate - just assigns increasing dummy ETAs
-    let dummyMinutes = 5;
-    for (const stopRef of route.stopIds) {
-      // Mongoose returns populated docs or just IDs - handle both cases
-      const stopId =
-        typeof stopRef === 'object' && '_id' in stopRef
-          ? (stopRef as any)._id.toString()
-          : stopRef;
-      if (stopId) {
-        etas.push({ stopId: stopId, etaMinutes: dummyMinutes });
-        dummyMinutes += 5; // Increment dummy ETA
+    if (!stops || stops.length === 0) {
+      return [];
+    }
+
+    // Sort stops by sequence in the route
+    const sortedStops = stops.sort((a: any, b: any) => {
+      const aIndex = route.stopIds.findIndex((id: any) => id.toString() === a._id.toString());
+      const bIndex = route.stopIds.findIndex((id: any) => id.toString() === b._id.toString());
+      return aIndex - bIndex;
+    });
+
+    // Find current position in route
+    // Get nearest point on route if route has geometry data
+    let nearestPointOnRoute = currentBusLocation;
+    
+    // Check if route has geometry data (added as any to bypass TypeScript error)
+    const routeWithGeometry = route as any;
+    if (routeWithGeometry.geometry) {
+      const result = this.mapService.findNearestPointOnRoute(
+        routeWithGeometry.geometry, 
+        currentBusLocation
+      );
+      if (result) {
+        nearestPointOnRoute = result;
+      }
+    }
+
+    // Calculate ETAs for each upcoming stop
+    const etas: { stopId: string; etaMinutes: number | null }[] = [];
+    
+    // Convert stop locations to proper Location objects
+    for (const stop of sortedStops) {
+      // Cast stop to any to bypass TypeScript errors
+      const typedStop = stop as any;
+      if (!typedStop.location) continue;
+      
+      const stopLocation: Location = {
+        latitude: typedStop.location.coordinates[1],
+        longitude: typedStop.location.coordinates[0]
+      };
+      
+      try {
+        // Calculate time using Map Service
+        const etaMinutes = await this.mapService.estimateTravelTimeBetweenPoints(
+          nearestPointOnRoute,
+          stopLocation
+        );
+        
+        etas.push({
+          stopId: typedStop._id.toString(),
+          etaMinutes
+        });
+        
+        // Update the reference point for next calculation
+        nearestPointOnRoute = stopLocation;
+      } catch (error) {
+        console.error(`Error calculating ETA for stop ${typedStop._id}:`, error);
+        etas.push({
+          stopId: typedStop._id.toString(),
+          etaMinutes: null
+        });
       }
     }
 
@@ -69,11 +118,5 @@ export class SimpleETAService implements IETAService {
     );
     const stopETA = routeETAs.find((eta) => eta.stopId === stopId);
     return stopETA?.etaMinutes ?? null;
-  }
-
-  // --- Helper for distance (Haversine formula - basic) ---
-  private calculateDistanceKm(loc1: Location, loc2: Location): number {
-    // ... implementation of Haversine ... Placeholder returns dummy
-    return Math.random() * 5 + 1; // Dummy distance
   }
 }

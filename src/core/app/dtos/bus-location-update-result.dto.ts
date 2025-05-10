@@ -1,4 +1,5 @@
 import { BusStatus } from '@core/domain/enums/bus-status.enum';
+import { Location } from '@core/domain/valueObjects/location.vo';
 
 // Define the structure of the update payload
 export interface IBusLocationUpdateResult {
@@ -7,6 +8,11 @@ export interface IBusLocationUpdateResult {
   routeId: string | null;
   status: BusStatus;
   etas: { stopId: string; etaMinutes: number | null }[]; // Calculated ETAs for relevant stops
+  heading?: number;
+  speed?: number;
+  accuracy?: number;
+  address?: string;
+  lastUpdate?: Date;
 }
 
 export class BusLocationUpdateResult implements IBusLocationUpdateResult {
@@ -15,6 +21,11 @@ export class BusLocationUpdateResult implements IBusLocationUpdateResult {
   routeId: string | null;
   status: BusStatus;
   etas: { stopId: string; etaMinutes: number | null }[];
+  heading?: number;
+  speed?: number;
+  accuracy?: number;
+  address?: string;
+  lastUpdate?: Date;
 
   constructor(
     busId: string,
@@ -22,11 +33,21 @@ export class BusLocationUpdateResult implements IBusLocationUpdateResult {
     routeId: string | null,
     status: BusStatus,
     etas: { stopId: string; etaMinutes: number | null }[] = [],
+    heading?: number,
+    speed?: number,
+    accuracy?: number,
+    address?: string,
+    lastUpdate?: Date,
   ) {
     this.busId = busId;
     this.location = location;
     this.routeId = routeId;
     this.status = status;
     this.etas = etas;
+    this.heading = heading;
+    this.speed = speed;
+    this.accuracy = accuracy;
+    this.address = address;
+    this.lastUpdate = lastUpdate;
   }
 }

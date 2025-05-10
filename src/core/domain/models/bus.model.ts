@@ -9,6 +9,11 @@ export interface IBus {
   busType: BusType;
   capacity: number;
   currentLocation?: Location; // Embedded Location (updated frequently)
+  lastLocationUpdate?: Date; // When the location was last updated
+  heading?: number; // Direction in degrees (0-360)
+  speed?: number; // Speed in km/h
+  locationAccuracy?: number; // Accuracy in meters
+  currentAddress?: string; // Reverse geocoded address
   assignedRouteId?: RouteId; // Reference to the current Route ID
   assignedDriverId?: UserId; // Reference to the current Driver User ID
   busStatus: BusStatus;

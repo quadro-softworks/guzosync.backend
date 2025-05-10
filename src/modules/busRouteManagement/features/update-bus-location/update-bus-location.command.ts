@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Location } from '@core/domain/valueObjects/location.vo';
 
 export const UpdateBusLocationSchema = z.object({
   params: z.object({
@@ -6,14 +7,13 @@ export const UpdateBusLocationSchema = z.object({
   }),
   body: z.object({
     location: z.object({
-      coordinates: z.tuple([
-        z.number().min(-180).max(180), // longitude
-        z.number().min(-90).max(90),   // latitude
-      ]).transform(coords => ({
-        type: 'Point',
-        coordinates: coords,
-      })),
-    }),
+      latitude: z.number().min(-90).max(90),
+      longitude: z.number().min(-180).max(180),
+      address: z.string().optional(),
+    }).transform(loc => ({
+      coordinates: [loc.longitude, loc.latitude],
+      type: 'Point',
+    })),
   }),
 });
 

@@ -46,6 +46,26 @@ const BusSchema = new Schema<IBusDocument>(
       type: LocationSchema, // Embed the location sub-schema
       index: '2dsphere', // Geospatial index if querying by location often
     },
+    lastLocationUpdate: {
+      type: Date,
+    },
+    heading: {
+      type: Number, // Direction in degrees (0-360)
+      min: 0,
+      max: 360,
+    },
+    speed: {
+      type: Number, // Speed in km/h
+      min: 0,
+    },
+    locationAccuracy: {
+      type: Number, // Accuracy in meters
+      min: 0,
+    },
+    currentAddress: {
+      type: String,
+      trim: true,
+    },
     assignedRouteId: {
       type: Schema.Types.ObjectId,
       ref: 'Route',
