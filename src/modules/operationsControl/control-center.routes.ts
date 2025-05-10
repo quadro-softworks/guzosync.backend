@@ -46,7 +46,7 @@ const controlCenterRoutes = (router: Router) => {
   // ✅ BUS STOP MANAGEMENT
   /**
    * @swagger
-   * /control-center/bus-stops:
+   * /api/control-center/bus-stops:
    *  post:
    *    description: Create a new bus stop
    *    responses:
@@ -61,7 +61,7 @@ const controlCenterRoutes = (router: Router) => {
 
   /**
    * @swagger
-   * /control-center/bus-stops:
+   * /api/control-center/bus-stops:
    *  get:
    *    description: List all bus stops with optional filtering
    *    parameters:
@@ -97,7 +97,7 @@ const controlCenterRoutes = (router: Router) => {
 
   /**
    * @swagger
-   * /control-center/bus-stops/{busStopId}:
+   * /api/control-center/bus-stops/{busStopId}:
    *  get:
    *    description: Get details of a specific bus stop
    *    parameters:
@@ -121,7 +121,7 @@ const controlCenterRoutes = (router: Router) => {
 
   /**
    * @swagger
-   * /control-center/bus-stops/{busStopId}:
+   * /api/control-center/bus-stops/{busStopId}:
    *  put:
    *    description: Update a specific bus stop
    *    parameters:
@@ -162,7 +162,7 @@ const controlCenterRoutes = (router: Router) => {
 
   /**
    * @swagger
-   * /control-center/bus-stops/{busStopId}:
+   * /api/control-center/bus-stops/{busStopId}:
    *  delete:
    *    description: Delete a specific bus stop
    *    parameters:
@@ -187,7 +187,7 @@ const controlCenterRoutes = (router: Router) => {
   // ✅ ROUTE MANAGEMENT
   /**
    * @swagger
-   * /control-center/routes:
+   * /api/control-center/routes:
    *  post:
    *    description: Create a new route
    *    requestBody:
@@ -227,7 +227,7 @@ const controlCenterRoutes = (router: Router) => {
 
   /**
    * @swagger
-   * /control-center/routes:
+   * /api/control-center/routes:
    *  get:
    *    description: List all routes with optional filtering
    *    parameters:
@@ -263,7 +263,7 @@ const controlCenterRoutes = (router: Router) => {
 
   /**
    * @swagger
-   * /control-center/routes/{routeId}:
+   * /api/control-center/routes/{routeId}:
    *  get:
    *    description: Get details of a specific route
    *    parameters:
@@ -288,7 +288,7 @@ const controlCenterRoutes = (router: Router) => {
   // ✅ BUS MANAGEMENT
   /**
    * @swagger
-   * /control-center/buses/{busId}/assign-route/{routeId}:
+   * /api/control-center/buses/{busId}/assign-route/{routeId}:
    *  put:
    *    description: Assign a bus to a route
    *    parameters:
