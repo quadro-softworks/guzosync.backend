@@ -90,15 +90,15 @@ GET /api/buses/stops (Get a list of all bus stops - potentially with search/filt
 Personalized Alerts:
 Functionality: Set alerts for specific buses or routes, receive notifications for delays, route changes.
 API Endpoints:
-GET /api/alerts (Get logged-in passenger's active alerts)
-POST /api/alerts (Create a new alert - for a bus or route, with alert type - delay, ETA change etc.)
-PUT /api/alerts/{alertId} (Update an existing alert)
-DELETE /api/alerts/{alertId} (Delete an alert)
+GET /api/passenger/alerts (Get logged-in passenger's active alerts)
+POST /api/passenger/alerts (Create a new alert - for a bus or route, with alert type - delay, ETA change etc.)
+PUT /api/passenger/alerts/{alertId} (Update an existing alert)
+DELETE /api/passenger/alerts/{alertId} (Delete an alert)
 Feedback:
 Functionality: Provide feedback on bus experience.
 API Endpoints:
-POST /api/trip/feedback (Submit feedback - includes trip details, rating, comments)
-GET /api/trip/feedback (Get logged-in passenger's submitted feedback - for history, optional)
+POST /api/passenger/trip/feedback (Submit feedback - includes trip details, rating, comments)
+GET /api/passenger/trip/feedback (Get logged-in passenger's submitted feedback - for history, optional)
 Search for Bus Fermatas (Bus Stops):
 Functionality: Search for bus stops by name or location.
 API Endpoints:

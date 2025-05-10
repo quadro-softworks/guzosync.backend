@@ -5,7 +5,7 @@ dotenv.config();
 const config = {
   // ... other config
   api: {
-    basePath: process.env.API_BASE_PATH || '/api',
+    basePath: process.env.API_BASE_PATH,
   },
   port: process.env.PORT || 3000,
   jwt: {

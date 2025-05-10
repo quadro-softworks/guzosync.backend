@@ -1,55 +1,68 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { IFeedback } from '@core/domain/models/feedback.model';
+import mongoose, { Document, Schema } from 'mongoose';
 
-// Applied the reversed Omit pattern here
-export interface IFeedbackDocument extends Omit<Document, 'id'>, IFeedback {}
+export interface IFeedback extends Document {
+  userId: mongoose.Types.ObjectId;
+  tripId?: string;
+  busId: string;
+  routeId: string;
+  rating: number;
+  comments?: string;
+  feedbackType?: 'SERVICE' | 'CLEANLINESS' | 'PUNCTUALITY' | 'SAFETY' | 'OTHER';
+  dateOfTrip: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-const FeedbackSchema = new Schema<IFeedbackDocument>(
+const feedbackSchema = new Schema<IFeedback>(
   {
-    // id is managed by Mongoose (_id) and transforms
-    submittedByUserId: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
-    content: {
+    tripId: {
+      type: String,
+      default: null,
+    },
+    busId: {
+      type: String,
+      required: true,
+    },
+    routeId: {
       type: String,
       required: true,
     },
     rating: {
       type: Number,
+      required: true,
       min: 1,
       max: 5,
     },
-    relatedTripId: {
-      type: Schema.Types.ObjectId, // Change if Trip ID is string in domain
-      ref: 'Trip',
+    comments: {
+      type: String,
+      default: null,
     },
-    relatedBusId: {
-      type: Schema.Types.ObjectId, // Change if Bus ID is string in domain
-      ref: 'Bus',
+    feedbackType: {
+      type: String,
+      enum: ['SERVICE', 'CLEANLINESS', 'PUNCTUALITY', 'SAFETY', 'OTHER'],
+      default: 'OTHER',
+    },
+    dateOfTrip: {
+      type: Date,
+      default: Date.now,
     },
   },
   {
     timestamps: true,
     toJSON: {
-      transform(doc, ret) {
+      transform: (_doc, ret) => {
         ret.id = ret._id.toString();
         delete ret._id;
         delete ret.__v;
+        return ret;
       },
     },
-    toObject: {
-      transform(doc, ret) {
-        ret.id = ret._id.toString();
-        delete ret._id;
-        delete ret.__v;
-      },
-    },
-  },
+  }
 );
 
-export const FeedbackModel = mongoose.model<IFeedbackDocument>(
-  'Feedback',
-  FeedbackSchema,
-);
+export const FeedbackModel = mongoose.model<IFeedback>('Feedback', feedbackSchema);

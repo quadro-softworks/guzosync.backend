@@ -9,11 +9,13 @@ import http from 'http';
 import { userRoutes } from '@modules/userManagement/user.routes';
 import registerServices from '@core/di/registerServices';
 import { busRoutes } from '@modules/busRouteManagement/bus.routes';
+import { busDriverRoutes } from '@modules/busRouteManagement/bus-driver.routes';
 import { routesRoutes } from '@modules/busRouteManagement/routes.routes';
 import { controlCenterRoutes } from '@modules/operationsControl/control-center.routes';
 import swaggerui from 'swagger-ui-express';
 import { swaggerSpec } from '@core/config/swaggerConfig';
 import { passengerRoutes } from '@modules/passengerService/passenger.routes';
+import { initSocketServer } from '@core/websocket/socket-server';
 
 type HttpServer = http.Server<
   typeof http.IncomingMessage,
@@ -26,6 +28,12 @@ const initializeApp = async (): Promise<[Express, HttpServer]> => {
   // --- Express App Setup ---
   const app: Express = express();
   const httpServer = http.createServer(app); // Create HTTP server with Express app
+
+  // Initialize Socket.IO server
+  initSocketServer(httpServer);
+
+  // Connect to MongoDB
+  await connectDB();
 
   registerMiddlewares(app);
 
@@ -40,7 +48,7 @@ const initializeApp = async (): Promise<[Express, HttpServer]> => {
 const registerMiddlewares = (app: Express) => {
   app.use(express.json()); // Middleware to parse JSON bodies
   app.use(express.urlencoded({ extended: true })); // Middleware for URL-encoded bodies
-  app.use('/swagger', swaggerui.serve, swaggerui.setup(swaggerSpec));
+    app.use('/swagger', swaggerui.serve, swaggerui.setup(swaggerSpec));
 };
 
 const registerRoutes = (app: Express) => {
@@ -49,17 +57,15 @@ const registerRoutes = (app: Express) => {
     res.status(200).send('Bus Tracking API is running!');
   });
 
-  app.use(`${config.api.basePath}/accounts`, userRoutes(app.router));
-  app.use(`${config.api.basePath}/buses`, busRoutes(app.router));
-  app.use(`${config.api.basePath}/routes`, routesRoutes(app.router));
-  app.use(
-    `${config.api.basePath}/control-center`,
-    controlCenterRoutes(app.router),
-  );
-  app.use(
-    `${config.api.basePath}/passenger`,
-    passengerRoutes(app.router),
-  );
+  // Ensure API base path has /api prefix as specified in requirements
+  const apiBasePath = '/api';
+
+  app.use(`${apiBasePath}/accounts`, userRoutes(app.router));
+  app.use(`${apiBasePath}/buses`, busRoutes(app.router));
+  app.use(`${apiBasePath}/driver`, busDriverRoutes(app.router));
+  app.use(`${apiBasePath}/routes`, routesRoutes(app.router));
+  app.use(`${apiBasePath}/control-center`, controlCenterRoutes(app.router));
+  app.use(`${apiBasePath}/passenger`, passengerRoutes(app.router));
 };
 
 const startServer = () => {
@@ -71,7 +77,7 @@ const startServer = () => {
       const port = config.port;
       httpServer.listen(port, () => {
         console.log(`Server running in ${config.nodeEnv} mode on port ${port}`);
-        console.log(`API base path: ${config.api.basePath}`);
+        console.log(`API base path: /api`);
       });
     })
     .catch((error) => {
