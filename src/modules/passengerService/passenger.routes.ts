@@ -8,14 +8,14 @@ import { GetRouteDetailsController } from './features/get-route-details/get-rout
 import { GetRouteDetailsQuerySchema } from './features/get-route-details/get-route-details.query';
 import { TrackBusLocationController } from './features/track-bus-location/track-bus-location.controller';
 import { TrackBusLocationQuerySchema } from './features/track-bus-location/track-bus-location.query';
-import { CreateAlertController } from './features/create-alert/create-alert.controller';
-import { CreateAlertSchema } from './features/create-alert/create-alert.command';
-import { GetAlertsController } from './features/get-alerts/get-alerts.controller';
-import { GetAlertsQuerySchema } from './features/get-alerts/get-alerts.query';
-import { UpdateAlertController } from './features/update-alert/update-alert.controller';
-import { UpdateAlertSchema } from './features/update-alert/update-alert.command';
-import { DeleteAlertController } from './features/delete-alert/delete-alert.controller';
-import { DeleteAlertSchema } from './features/delete-alert/delete-alert.command';
+import { CreateAlertController } from '../userManagement/features/create-alert/create-alert.controller';
+import { CreateAlertSchema } from '../userManagement/features/create-alert/create-alert.command';
+import { GetAlertsController } from '../userManagement/features/get-alerts/get-alerts.controller';
+import { GetAlertsQuerySchema } from '../userManagement/features/get-alerts/get-alerts.query';
+import { UpdateAlertController } from '../userManagement/features/update-alert/update-alert.controller';
+import { UpdateAlertSchema } from '../userManagement/features/update-alert/update-alert.command';
+import { DeleteAlertController } from '../userManagement/features/delete-alert/delete-alert.controller';
+import { DeleteAlertSchema } from '../userManagement/features/delete-alert/delete-alert.command';
 import { CreateFeedbackController } from './features/create-feedback/create-feedback.controller';
 import { CreateFeedbackSchema } from './features/create-feedback/create-feedback.command';
 import { GetFeedbackController } from './features/get-feedback/get-feedback.controller';
@@ -27,10 +27,9 @@ export const passengerRoutes = (router: Router) => {
   const getBusDetailsController = new GetBusDetailsController();
   const getRouteDetailsController = new GetRouteDetailsController();
   const trackBusLocationController = new TrackBusLocationController();
-  const createAlertController = new CreateAlertController();
-  const getAlertsController = new GetAlertsController();
-  const updateAlertController = new UpdateAlertController();
-  const deleteAlertController = new DeleteAlertController();
+  
+  
+
   const createFeedbackController = new CreateFeedbackController();
   const getFeedbackController = new GetFeedbackController();
 
@@ -158,160 +157,9 @@ export const passengerRoutes = (router: Router) => {
     trackBusLocationController.trackBusLocation,
   );
 
-  /**
-   * @swagger
-   * /api/passenger/alerts:
-   *  get:
-   *    description: Get all alerts for the authenticated user
-   *    security:
-   *      - bearerAuth: []
-   *    parameters:
-   *      - in: query
-   *        name: page
-   *        schema:
-   *          type: integer
-   *        description: Page number for pagination
-   *      - in: query
-   *        name: limit
-   *        schema:
-   *          type: integer
-   *        description: Number of items per page
-   *      - in: query
-   *        name: isActive
-   *        schema:
-   *          type: boolean
-   *        description: Filter by active status
-   *    responses:
-   *      200:
-   *        description: Alerts retrieved successfully
-   *      401:
-   *        description: Unauthorized
-   */
-  router.get(
-    '/alerts',
-    requireAuth,
-    validateRequest(GetAlertsQuerySchema),
-    getAlertsController.getAlerts,
-  );
+  
 
-  /**
-   * @swagger
-   * /api/passenger/alerts:
-   *  post:
-   *    description: Create a new alert
-   *    security:
-   *      - bearerAuth: []
-   *    requestBody:
-   *      required: true
-   *      content:
-   *        application/json:
-   *          schema:
-   *            type: object
-   *            properties:
-   *              alertType:
-   *                type: string
-   *                enum: [DELAY, ARRIVAL, DEPARTURE, ROUTE_CHANGE, ETA_CHANGE, CAPACITY]
-   *              targetId:
-   *                type: string
-   *                description: Bus ID, Route ID, or Bus Stop ID
-   *              targetType:
-   *                type: string
-   *                enum: [BUS, ROUTE, BUS_STOP]
-   *              threshold:
-   *                type: number
-   *                description: For alerts based on time thresholds (in minutes)
-   *              message:
-   *                type: string
-   *              isActive:
-   *                type: boolean
-   *    responses:
-   *      201:
-   *        description: Alert created successfully
-   *      401:
-   *        description: Unauthorized
-   *      404:
-   *        description: Target not found
-   */
-  router.post(
-    '/alerts',
-    requireAuth,
-    validateRequest(CreateAlertSchema),
-    createAlertController.createAlert,
-  );
-
-  /**
-   * @swagger
-   * /api/passenger/alerts/{alertId}:
-   *  put:
-   *    description: Update an existing alert
-   *    security:
-   *      - bearerAuth: []
-   *    parameters:
-   *      - in: path
-   *        name: alertId
-   *        schema:
-   *          type: string
-   *        required: true
-   *        description: ID of the alert to update
-   *    requestBody:
-   *      required: true
-   *      content:
-   *        application/json:
-   *          schema:
-   *            type: object
-   *            properties:
-   *              alertType:
-   *                type: string
-   *                enum: [DELAY, ARRIVAL, DEPARTURE, ROUTE_CHANGE, ETA_CHANGE, CAPACITY]
-   *              threshold:
-   *                type: number
-   *              message:
-   *                type: string
-   *              isActive:
-   *                type: boolean
-   *    responses:
-   *      200:
-   *        description: Alert updated successfully
-   *      401:
-   *        description: Unauthorized
-   *      404:
-   *        description: Alert not found
-   */
-  router.put(
-    '/alerts/:alertId',
-    requireAuth,
-    validateRequest(UpdateAlertSchema),
-    updateAlertController.updateAlert,
-  );
-
-  /**
-   * @swagger
-   * /api/passenger/alerts/{alertId}:
-   *  delete:
-   *    description: Delete an alert
-   *    security:
-   *      - bearerAuth: []
-   *    parameters:
-   *      - in: path
-   *        name: alertId
-   *        schema:
-   *          type: string
-   *        required: true
-   *        description: ID of the alert to delete
-   *    responses:
-   *      200:
-   *        description: Alert deleted successfully
-   *      401:
-   *        description: Unauthorized
-   *      404:
-   *        description: Alert not found
-   */
-  router.delete(
-    '/alerts/:alertId',
-    requireAuth,
-    validateRequest(DeleteAlertSchema),
-    deleteAlertController.deleteAlert,
-  );
+  
 
   /**
    * @swagger

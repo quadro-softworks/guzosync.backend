@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe';
-import { AlertModel } from '../../infrastructure/mongodb/schemas/alert.schema';
+import { AlertModel } from '../../../passengerService/infrastructure/mongodb/schemas/alert.schema';
 import { GetAlertsQuery } from './get-alerts.query';
 import { AlertResult } from '@core/app/dtos/alert-result.dto';
 import { plainToClass } from 'class-transformer';

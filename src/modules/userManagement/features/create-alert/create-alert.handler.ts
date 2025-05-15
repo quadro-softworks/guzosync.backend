@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { AlertModel } from '../../infrastructure/mongodb/schemas/alert.schema';
+import { AlertModel } from '../../../passengerService/infrastructure/mongodb/schemas/alert.schema';
 import { CreateAlertCommand } from './create-alert.command';
 import { BusModel } from '@modules/busRouteManagement/infrastructure/mongodb/schemas/bus.schema';
 import { RouteModel } from '@modules/busRouteManagement/infrastructure/mongodb/schemas/route.schema';

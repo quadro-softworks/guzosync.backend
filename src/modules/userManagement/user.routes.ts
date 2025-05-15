@@ -22,6 +22,14 @@ import { UpdateLanguageController } from '@modules/userManagement/features/updat
 import { UpdateLanguageSchema } from '@modules/userManagement/features/update-language/update-language.command';
 import { UpdateNotificationSettingsController } from '@modules/userManagement/features/update-notification-settings/update-notification-settings.controller';
 import { UpdateNotificationSettingsSchema } from '@modules/userManagement/features/update-notification-settings/update-notification-settings.command';
+import { GetAlertsQuerySchema } from './features/get-alerts/get-alerts.query';
+import { GetAlertsController } from './features/get-alerts/get-alerts.controller';
+import { CreateAlertController } from './features/create-alert/create-alert.controller';
+import { DeleteAlertController } from './features/delete-alert/delete-alert.controller';
+import { UpdateAlertController } from './features/update-alert/update-alert.controller';
+import { CreateAlertSchema } from './features/create-alert/create-alert.command';
+import { DeleteAlertSchema } from './features/delete-alert/delete-alert.command';
+import { UpdateAlertSchema } from './features/update-alert/update-alert.command';
 
 export const userRoutes = (router: Router) => {
   // Instantiate controllers
@@ -34,6 +42,10 @@ export const userRoutes = (router: Router) => {
   const updateMyProfileController = new UpdateMyProfileController();
   const updateLanguageController = new UpdateLanguageController();
   const updateNotificationSettingsController = new UpdateNotificationSettingsController();
+  const getAlertsController = new GetAlertsController();
+  const createAlertController = new CreateAlertController();
+    const deleteAlertController = new DeleteAlertController();
+    const updateAlertController = new UpdateAlertController();
 
   /**
    * @swagger
@@ -113,6 +125,8 @@ export const userRoutes = (router: Router) => {
     validateRequest(RegisterUserSchema),
     registerUserController.register,
   );
+
+  
 
   /**
    * @swagger
@@ -241,7 +255,7 @@ export const userRoutes = (router: Router) => {
 
   /**
    * @swagger
-   * /api/account/me:
+   * /api/accounts/me:
    *  get:
    *    tags: [User Profile]
    *    description: Get the profile of the currently authenticated user
@@ -261,7 +275,7 @@ export const userRoutes = (router: Router) => {
 
   /**
    * @swagger
-   * /api/account/me:
+   * /api/accounts/me:
    *  put:
    *    tags: [User Profile]
    *    description: Update the profile of the currently authenticated user
@@ -325,7 +339,7 @@ export const userRoutes = (router: Router) => {
 
   /**
    * @swagger
-   * /api/account/language:
+   * /api/accounts/language:
    *  put:
    *    tags: [User Preferences]
    *    description: Update the preferred language of the currently authenticated user
@@ -360,7 +374,7 @@ export const userRoutes = (router: Router) => {
 
   /**
    * @swagger
-   * /api/account/notification-settings:
+   * /api/accounts/notification-settings:
    *  put:
    *    tags: [User Preferences]
    *    description: Update notification preferences for the currently authenticated user
@@ -448,6 +462,165 @@ export const userRoutes = (router: Router) => {
     
     res.status(200).json({ languages });
   });
+
+  /**
+   * @swagger
+   * /api/accounts/alerts:
+   *  get:
+   *    tags: [User Preferences]
+   *    description: Get all alerts for the authenticated user
+   *    security:
+   *      - bearerAuth: []
+   *    parameters:
+   *      - in: query
+   *        name: page
+   *        schema:
+   *          type: integer
+   *        description: Page number for pagination
+   *      - in: query
+   *        name: limit
+   *        schema:
+   *          type: integer
+   *        description: Number of items per page
+   *      - in: query
+   *        name: isActive
+   *        schema:
+   *          type: boolean
+   *        description: Filter by active status
+   *    responses:
+   *      200:
+   *        description: Alerts retrieved successfully
+   *      401:
+   *        description: Unauthorized
+   */
+router.get(
+  '/alerts',
+  requireAuth,
+  validateRequest(GetAlertsQuerySchema),
+  getAlertsController.getAlerts,
+);
+
+  /**
+     * @swagger
+     * /api/passenger/alerts:
+     *  post:
+     *    tags: [User Preferences]
+     *    description: Create a new alert
+     *    security:
+     *      - bearerAuth: []
+     *    requestBody:
+     *      required: true
+     *      content:
+     *        application/json:
+     *          schema:
+     *            type: object
+     *            properties:
+     *              alertType:
+     *                type: string
+     *                enum: [DELAY, ARRIVAL, DEPARTURE, ROUTE_CHANGE, ETA_CHANGE, CAPACITY]
+     *              targetId:
+     *                type: string
+     *                description: Bus ID, Route ID, or Bus Stop ID
+     *              targetType:
+     *                type: string
+     *                enum: [BUS, ROUTE, BUS_STOP]
+     *              threshold:
+     *                type: number
+     *                description: For alerts based on time thresholds (in minutes)
+     *              message:
+     *                type: string
+     *              isActive:
+     *                type: boolean
+     *    responses:
+     *      201:
+     *        description: Alert created successfully
+     *      401:
+     *        description: Unauthorized
+     *      404:
+     *        description: Target not found
+     */
+    router.post(
+      '/alerts',
+      requireAuth,
+      validateRequest(CreateAlertSchema),
+      createAlertController.createAlert,
+    );
+  
+    /**
+     * @swagger
+     * /api/passenger/alerts/{alertId}:
+     *  put:
+     *    tags: [User Preferences]
+     *    description: Update an existing alert
+     *    security:
+     *      - bearerAuth: []
+     *    parameters:
+     *      - in: path
+     *        name: alertId
+     *        schema:
+     *          type: string
+     *        required: true
+     *        description: ID of the alert to update
+     *    requestBody:
+     *      required: true
+     *      content:
+     *        application/json:
+     *          schema:
+     *            type: object
+     *            properties:
+     *              alertType:
+     *                type: string
+     *                enum: [DELAY, ARRIVAL, DEPARTURE, ROUTE_CHANGE, ETA_CHANGE, CAPACITY]
+     *              threshold:
+     *                type: number
+     *              message:
+     *                type: string
+     *              isActive:
+     *                type: boolean
+     *    responses:
+     *      200:
+     *        description: Alert updated successfully
+     *      401:
+     *        description: Unauthorized
+     *      404:
+     *        description: Alert not found
+     */
+    router.put(
+      '/alerts/:alertId',
+      requireAuth,
+      validateRequest(UpdateAlertSchema),
+      updateAlertController.updateAlert,
+    );
+  
+    /**
+     * @swagger
+     * /api/passenger/alerts/{alertId}:
+     *  delete:
+     *    tags: [User Preferences]
+     *    description: Delete an alert
+     *    security:
+     *      - bearerAuth: []
+     *    parameters:
+     *      - in: path
+     *        name: alertId
+     *        schema:
+     *          type: string
+     *        required: true
+     *        description: ID of the alert to delete
+     *    responses:
+     *      200:
+     *        description: Alert deleted successfully
+     *      401:
+     *        description: Unauthorized
+     *      404:
+     *        description: Alert not found
+     */
+    router.delete(
+      '/alerts/:alertId',
+      requireAuth,
+      validateRequest(DeleteAlertSchema),
+      deleteAlertController.deleteAlert,
+    );
 
   return router;
 };

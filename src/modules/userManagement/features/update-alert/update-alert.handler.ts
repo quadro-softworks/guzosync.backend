@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { AlertModel } from '../../infrastructure/mongodb/schemas/alert.schema';
+import { AlertModel } from '../../../passengerService/infrastructure/mongodb/schemas/alert.schema';
 import { UpdateAlertCommand } from './update-alert.command';
 import { NotFoundError } from '@core/errors/not-found.error';
 import { UnauthorizedError } from '@core/errors/unauthorized.error';
