@@ -11,6 +11,12 @@ export const validateRequest =
       // if (type === 'query') await schema.parseAsync(req.query);
       // else if (type === 'params') await schema.parseAsync(req.params);
       // else if (type === 'body') await schema.parseAsync(req.body);
+
+     console.log('Validating request: \nBody', req.body);
+     console.log('\nQuery:', req.query);
+     console.log('\nParam:', req.params);
+
+
       await schema.parseAsync({
         body: req.body,
         params: req.params,

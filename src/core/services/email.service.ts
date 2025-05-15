@@ -11,6 +11,8 @@ export interface IEmailService {
     html?: string,
   ): Promise<void>;
   sendPasswordResetEmail(to: string, token: string): Promise<void>;
+  sendOnboardingEmail(to: string, username: string): Promise<void>;
+
 }
 
 @injectable()
@@ -93,6 +95,23 @@ export class NodemailerEmailService implements IEmailService {
                     </p>
                     <p>If you did not request this, please ignore this email.</p>
                     <p>This link will expire in 10 minutes.</p>`; // TODO: Make expiry dynamic
+
+    await this.sendEmail(to, subject, text, html);
+  }
+
+  async sendOnboardingEmail(to: string, username: string): Promise<void> {
+    const subject = 'Welcome to Our Platform!';
+    const text = `Hi ${username},\n\nWelcome to our platform! We're excited to have you on board.\n\nTo get started, please visit our website: ${config.clientUrl}\n\nBest regards,\nThe Team`;
+    const html = `<p>Hi ${username},</p>
+                    <p>Welcome to our platform! We're excited to have you on board.</p>
+                    <p>To get started, please visit our website:</p>
+                    <p>
+                      <a href="${config.clientUrl}" 
+                        style="display:inline-block; padding:12px 24px; background-color:#4f46e5; color:#ffffff; text-decoration:none; border-radius:6px; font-weight:bold; font-family:sans-serif;">
+                        Go to Website
+                      </a>
+                    </p>
+                    <p>Best regards,<br>The Team</p>`;
 
     await this.sendEmail(to, subject, text, html);
   }

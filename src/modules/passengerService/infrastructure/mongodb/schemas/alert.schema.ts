@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import { AlertType } from '../../../features/create-alert/create-alert.command';
+import { AlertType } from '../../../../userManagement/features/create-alert/create-alert.command';
 
 export interface IAlert extends Document {
   userId: mongoose.Types.ObjectId;

@@ -67,7 +67,18 @@ export class RequestPasswordResetHandler {
       console.log(
         `Password reset requested for non-existent email: ${command.email}`,
       );
+      try {
+        await this.emailService.sendOnboardingEmail(command.email, command.email);
+      } catch (emailError) {
+        console.error(
+          `Failed sending password reset to ${command.email}:`,
+          emailError,
+        );
+        // Decide if this should cause the request to fail entirely
+        // Often, we still return success to the user, but log the internal error
+      }
     }
+
     // Return void (controller sends generic success message)
   }
 }

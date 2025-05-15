@@ -7,21 +7,44 @@ jest.mock('@turf/turf', () => ({
   distance: jest.fn().mockReturnValue(5), // Mock 5km distance
   nearestPointOnLine: jest.fn().mockImplementation((line, point) => ({
     geometry: {
-      coordinates: [point.coordinates[0] + 0.001, point.coordinates[1] + 0.001]
+      coordinates: [point.geometry.coordinates[0] + 0.001, point.geometry.coordinates[1] + 0.001]
     }
   }))
 }));
 
+// Mock MapBox SDK
+const mockDirectionsClient = {
+  getDirections: jest.fn().mockReturnValue({
+    send: jest.fn().mockResolvedValue({
+      body: {
+        routes: [{ duration: 600 }] // 10 minutes
+      }
+    })
+  })
+};
+
+jest.mock('@mapbox/mapbox-sdk/services/directions', () => {
+  return jest.fn().mockImplementation(() => mockDirectionsClient);
+});
+
 describe('MapBoxService', () => {
   let service: MapBoxService;
+  const originalEnv = process.env;
 
   beforeEach(() => {
-    // Reset environment variables
+    // Set test environment variables
     process.env.MAPBOX_TOKEN = 'test-token';
+    
+    // Create service instance
     service = new MapBoxService();
     
-    // Reset mocks
+    // Clear all mocks
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    // Restore original environment
+    process.env = originalEnv;
   });
 
   describe('calculateDistanceKm', () => {
@@ -79,6 +102,32 @@ describe('MapBoxService', () => {
   });
 
   describe('estimateTravelTimeBetweenPoints', () => {
+    it('should estimate travel time between points', async () => {
+      const origin = { latitude: 9.005401, longitude: 38.763611 };
+      const destination = { latitude: 9.015401, longitude: 38.773611 };
+      
+      const result = await service.estimateTravelTimeBetweenPoints(origin, destination);
+      
+      // Since we mocked the MapBox response to be 600 seconds (10 minutes)
+      expect(result).toBe(10);
+    });
+    
+    it('should fall back to basic calculation if MapBox request fails', async () => {
+      // Mock a rejection for this specific test
+      mockDirectionsClient.getDirections().send.mockRejectedValueOnce(new Error('API error'));
+      
+      const origin = { latitude: 9.005401, longitude: 38.763611 };
+      const destination = { latitude: 9.015401, longitude: 38.773611 };
+      
+      // Mock the basic estimation method
+      jest.spyOn(service as any, 'estimateTravelTimeBasic').mockReturnValueOnce(15);
+      
+      const result = await service.estimateTravelTimeBetweenPoints(origin, destination);
+      
+      expect(result).toBe(15);
+      expect((service as any).estimateTravelTimeBasic).toHaveBeenCalledWith(origin, destination);
+    });
+    
     it('should fall back to basic calculation if no MAPBOX_TOKEN', async () => {
       process.env.MAPBOX_TOKEN = '';
       const newService = new MapBoxService(); // Recreate with empty token
