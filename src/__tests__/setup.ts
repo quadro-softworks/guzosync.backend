@@ -100,6 +100,51 @@ jest.mock('@core/app/dtos/bus-location-update-result.dto', () => {
   };
 });
 
+jest.mock('mongoose', () => {
+  // Use createMockFromModule to retain some default behaviors if needed,
+  // or just create a simple object.
+  const mongoose = jest.createMockFromModule('mongoose');
+
+  // Manually add the Schema.Types structure with ObjectId
+  mongoose.Schema = {
+    Types: {
+      ObjectId: jest.fn(), // Mock ObjectId type or a simple placeholder object
+      // Add other types if your schemas use them (e.g., String, Number, etc.)
+    },
+    // Add other Schema properties/methods you might need mocked if you
+    // create new Schema objects in tests, though this is less common
+    // for the 'type' property itself.
+  };
+
+  // Mock the connection status or methods if needed for tests that
+  // check connection state. For schema loading, Schema.Types is key.
+  // mongoose.connect = jest.fn();
+  // mongoose.connection = {
+  //   readyState: 1 // 1 means connected
+  //   // ... other connection properties/methods you might use
+  // };
+
+  // Mock the model function if you are using mongoose.model in files
+  // that are *not* already mocked like your UserModel above.
+  // mongoose.model = jest.fn((name, schema) => ({ // Return a mock Model
+  //   // Mock common model methods like find, findOne, create, etc.
+  //   find: jest.fn(),
+  //   findOne: jest.fn(),
+  //   create: jest.fn(),
+  //   // ... and so on
+  // }));
+
+
+  // If your schemas use mongoose.Types directly, you might need this too
+  // (though less common than Schema.Types)
+  // mongoose.Types = {
+  //   ObjectId: jest.fn(),
+  // };
+
+
+  return mongoose;
+});
+
 // Set environment variables for tests
 process.env.JWT_SECRET = 'test-jwt-secret';
 process.env.MAPBOX_TOKEN = 'test-mapbox-token'; 
